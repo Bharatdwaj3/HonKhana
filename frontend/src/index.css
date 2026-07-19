@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  /* Light & Calm Theme - Optimized for Reading */
+  
+  /* Backgrounds */
+  --color-background: #fafaf9;    /* Soft warm off-white (easier on eyes than pure white) */
+  --color-foreground: #1f2937;    /* Dark gray for text (not pure black - less harsh) */
+  
+  /* Primary - Berry Red (keeping your accent, but slightly adjusted) */
+  --color-primary: #dc2626;       /* Vibrant red for CTAs and important actions */
+  
+  /* Secondary - Calm Teal (professional, inviting) */
+  --color-secondary: #0d9488;     /* Teal for secondary actions and accents */
+  
+  /* Accent - Warm Amber (highlights, notifications) */
+  --color-accent: #f59e0b;        /* Warm amber for highlights and special elements */
+  
+  /* Cards & Surfaces */
+  --color-card: #ffffff;          /* Pure white for content cards */
+  --color-border: #e5e7eb;        /* Light gray borders (subtle separation) */
+  
+  /* Border radius */
+  --radius: 0.75rem;              /* Slightly softer than 1rem for modern feel */
+}
+
+@layer components {
+  /* Glass effect for overlays, modals, dropdowns */
+  .glass {
+    background: color-mix(in srgb, var(--color-card) 95%, transparent);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  }
+}
+
+@layer components {
+  /* Main background - subtle gradient for depth */
+  .bg-semi-dark {
+    background: linear-gradient(135deg, #fafaf9 0%, #f5f5f4 50%, #f0f0ef 100%);
+    background-attachment: fixed;
+  }
+}
+
+/* Additional utility classes for reading experience */
+@layer components {
+  /* Reading container - optimal width and spacing */
+  .reading-container {
+    max-width: 42rem; /* 672px - optimal for reading */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  /* Article text styling */
+  .article-text {
+    font-size: 1.125rem;    /* 18px */
+    line-height: 1.75;       /* 28px - comfortable reading */
+    color: var(--color-foreground);
+  }
+  
+  /* Card with subtle shadow */
+  .content-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .content-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+}
