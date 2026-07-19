@@ -3,7 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import bookRoutes from './routes/book.routes.ts';
 import storageRoutes from './routes/storage.routes.ts';
-import { PORT } from './config/env.config.ts';
+import { PORT, FRONTEND_ORIGIN } from './config/env.config.ts';
 
 const app = express();
 

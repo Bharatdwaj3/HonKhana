@@ -7,6 +7,42 @@ import PERMISSIONS from '../config/permissions.config.ts';
 
 const PUBLIC_SIGNUP_ROLES = ['faculty', 'student']; // admin excluded — seed-only
 
+
+export const completeProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const role = req.user?.role;
+
+    if (!userId || !role) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const { email, Fname, Lname, age, gender, Expertise, Subjects } = req.body;
+
+    if (role === 'faculty') {
+      const faculty = await prisma.faculty.create({
+        data: { email, Fname, Lname, age: Number(age), gender, Expertise, userId },
+      });
+      res.status(201).json(faculty);
+      return;
+    }
+
+    if (role === 'student') {
+      const student = await prisma.student.create({
+        data: { email, Fname, Lname, age: Number(age), gender, Subjects, userId },
+      });
+      res.status(201).json(student);
+      return;
+    }
+
+    res.status(400).json({ message: `Role "${role}" has no profile to complete` });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to complete profile';
+    res.status(500).json({ message });
+  }
+};
+
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, role } = req.body;
@@ -94,7 +130,11 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, role: true, createdAt: true },
+      select: {
+        id: true, email: true, role: true, createdAt: true,
+        faculty: true,
+        student: true,
+      },
     });
 
     if (!user) {

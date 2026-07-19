@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { firebaseAuth } from '../middleware/fireauth.middleware.ts';
+import { authUser } from '../middleware/auth.middleware.ts';
 import {
   uploadFile,
   getFileUrl,
@@ -19,7 +19,7 @@ const upload = multer({
 });
 
 // Upload file (protected)
-router.post('/upload', firebaseAuth, upload.single('file'), uploadFile);
+router.post('/upload', authUser, upload.single('file'), uploadFile);
 
 // Get file URL (public)
 router.get('/file/:fileName', getFileUrl);
@@ -28,6 +28,6 @@ router.get('/file/:fileName', getFileUrl);
 router.get('/files', listFiles);
 
 // Delete file (protected)
-router.delete('/file/:fileName', firebaseAuth, deleteFile);
+router.delete('/file/:fileName', authUser, deleteFile);
 
 export default router;

@@ -1,45 +1,40 @@
-import {Router} from 'express';
-import { firebaseAuth } from '../middleware/fireauth.middleware.ts';
+import { Router } from 'express';
+import { authUser } from '../middleware/auth.middleware.ts';
 import { requireRole } from '../middleware/role.middleware.ts';
 
-const router=Router();
-
+const router = Router();
 
 import {
-listFaculty,
+  listFaculty,
   getFaculty,
   registerFaculty,
   updateFaculty,
   removeFaculty,
-    
 } from "../controller/faculty.controller.ts";
 
-
-
-
-
 router.get('/',
-    requireRole(['admin','seller','customer']),
+    authUser,
+    requireRole(['admin', 'faculty', 'student']),
     listFaculty);
-    
+
 router.post('/',
-    firebaseAuth,
+    authUser,
     requireRole(['admin']),
     registerFaculty);
 
 router.get('/:id',
-    firebaseAuth, 
-    requireRole(['student','admin', 'faculty']), 
+    authUser,
+    requireRole(['student', 'admin', 'faculty']),
     getFaculty);
 
 router.put('/profile/:id',
-    firebaseAuth, 
-    requireRole(['admin','faculty']), 
+    authUser,
+    requireRole(['admin', 'faculty']),
     updateFaculty);
 
 router.delete('/:id',
-    requireRole(['admin', 'faculty']), 
+    authUser,
+    requireRole(['admin', 'faculty']),
     removeFaculty);
-
 
 export default router;

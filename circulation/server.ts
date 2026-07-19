@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import loanRoutes from './routes/loan.routes.ts';
-import { PORT } from './config/env.config.ts';
+import { PORT, FRONTEND_ORIGIN } from './config/env.config.ts';
 
 const app = express();
 
