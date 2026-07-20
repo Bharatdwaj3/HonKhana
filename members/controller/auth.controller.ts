@@ -71,8 +71,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({ message: 'Registered. Now complete your profile.', id: user.id, email: user.email, role: user.role });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Registration failed';
-    res.status(500).json({ message });
+    console.error('REGISTER ERROR:', error);
+    res.status(500).json({ message: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : null });
   }
 };
 

@@ -71,7 +71,7 @@ services:
     container_name: catalog_ctr
     restart: unless-stopped
     env_file:
-      - ./catalog/.env
+      - ./catalog/.env.prod
     ports:
       - 4001:4001
     networks:
@@ -88,7 +88,7 @@ services:
     container_name: circulation_ctr
     restart: unless-stopped
     env_file:
-      - ./circulation/.env
+      - ./circulation/.env.prod
     ports:
       - 4002:4002
     networks:
@@ -107,7 +107,7 @@ services:
     container_name: members_ctr
     restart: unless-stopped
     env_file:
-      - ./members/.env
+      - ./members/.env.prod
     ports:
       - 4003:4003
     networks:

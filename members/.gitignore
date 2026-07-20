@@ -24,7 +24,10 @@ dist-ssr
 *.sw?
 *.env
 *.env
+.env.docker
 .env
-.env.local.env
+.env.local
+.env.prod
+
 
 /generated/prisma

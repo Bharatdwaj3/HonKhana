@@ -1,19 +1,18 @@
 import PERMISSIONS from '../config/permissions.config.ts';
-import express from 'express';
+import type { Response, NextFunction } from 'express';
+import type { AuthRequest } from './auth.middleware.ts';
 
-type Request = express.Request;
-type Response = express.Response;
-type NextFunction = express.NextFunction;
+const checkPermission = (permission: string) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+    const userRole = req.user?.role;
+    const allowed = userRole ? PERMISSIONS[userRole] || [] : [];
 
-const checkPermission=(permission: any)=>{
-    return (req:Request, res:Response, next:NextFunction)=>{
-        const userRole = req.role || req.user?.accountType || 'guest';
-        const allowed = PERMISSIONS[userRole] || [];
-        if(!allowed.includes(permission)){
-            return res.status(403).json({message: 'Access denied insuffient permissions'});
-        }
-        next();
-    };
+    if (!allowed.includes(permission)) {
+      res.status(403).json({ message: 'Access denied: insufficient permissions', required: permission });
+      return;
+    }
+    next();
+  };
 };
 
 export default checkPermission;

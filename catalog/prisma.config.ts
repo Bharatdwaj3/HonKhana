@@ -1,16 +1,17 @@
-import 'dotenv/config';
-import { defineConfig, env } from '@prisma/config';
+import { defineConfig } from '@prisma/config';
+import {
+  PgSql_User,
+  PgSql_Password,
+  PgSql_Database,
+  PgSql_Host,
+  PgSql_Port,
+} from './config/env.config.ts';
 
-const user = env('PgSql_User');
-const pword = env('PgSql_Password');
-const db = env('PgSql_Database');
-const host = process.env.PgSql_Host || 'catalog-db';
-const port = process.env.PgSql_Port || '5432';
-const EPword = encodeURIComponent(pword);
+const EPword = encodeURIComponent(PgSql_Password);
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    url: `postgresql://${user}:${EPword}@${host}:${port}/${db}?schema=public`,
+    url: `postgresql://${PgSql_User}:${EPword}@${PgSql_Host}:${PgSql_Port}/${PgSql_Database}?schema=public`,
   },
 });
