@@ -1,0 +1,5 @@
+namespace: game-stora
+
+resources:
+  - frontend-ingress.yaml
+  - selfsigned-issuer.yaml
