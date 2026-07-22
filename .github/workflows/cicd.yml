@@ -1,4 +1,4 @@
-name: game-stora CI/CD
+name: hon-khana CI/CD
 
 on:
   push:
@@ -16,8 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        
-        service: [User, Product, Cart, frontend]
+        service: [catalog, circulation, members, frontend]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -44,7 +43,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [User, Product, Cart, frontend]
+        service: [catalog, circulation, members, frontend]
 
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +68,7 @@ jobs:
         with:
           context: ./${{ matrix.service }}
           push: true
-          tags: ghcr.io/${{ env.OWNER_LC }}/refine-devops/${{ env.SERVICE_LC }}:${{ env.SHORT_SHA }}
+          tags: ghcr.io/${{ env.OWNER_LC }}/${{ env.SERVICE_LC }}:${{ env.SHORT_SHA }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
   update-manifest:

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: circulation-db
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app-name: circulation-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app-name: circulation-db
+    spec:
+      containers:
+        - envFrom:
+          - secretRef:
+              name: circulation-secrets 
+          image: postgres:15-alpine
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready -
+                - -U 
+                - circulation_user 
+                - -d 
+                - circulation_db
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: circulation-db-ctr
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: circulation-data
+      restartPolicy: Always
+      volumes:
+        - name: circulation-data
+          persistentVolumeClaim:
+            claimName: circulation-data
+status: {}

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: frontend-nginx-config
-  namespace: game-stora
+  namespace: hon-khana
 data:
   default.conf: |
     server {
@@ -13,22 +13,22 @@ data:
 
         location /api/users/ {
             rewrite ^/api/users/(.*)$ /users/$1 break;
-            proxy_pass http://user.game-stora.svc.cluster.local:9001;
+            proxy_pass http://user.hon-khana.svc.cluster.local:9001;
         }
 
         location /api/products/ {
             rewrite ^/api/products/(.*)$ /products/$1 break;
-            proxy_pass http://product.game-stora.svc.cluster.local:9003;
+            proxy_pass http://product.hon-khana.svc.cluster.local:9003;
         }
 
         location /api/filter/ {
             rewrite ^/api/filter/(.*)$ /filter/$1 break;
-            proxy_pass http://product.game-stora.svc.cluster.local:9003;
+            proxy_pass http://product.hon-khana.svc.cluster.local:9003;
         }
 
         location /api/cart/ {
             rewrite ^/api/cart/(.*)$ /cart/$1 break;
-            proxy_pass http://cart.game-stora.svc.cluster.local:9002;
+            proxy_pass http://cart.hon-khana.svc.cluster.local:9002;
         }
 
         location / {

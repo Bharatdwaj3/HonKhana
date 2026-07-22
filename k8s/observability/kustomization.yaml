@@ -1,4 +1,4 @@
-namespace: game-stora
+namespace: hon-khana
 
 # 1. Automatically turn your local config files into ConfigMaps
 configMapGenerator:

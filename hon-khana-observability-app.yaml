@@ -1,20 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: game-stora
+  name: hon-khana-observability
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/Bharatdwaj3/refine-devops.git
     targetRevision: main
-    path: k8s
-    directory:
-      recurse: true
-      exclude: 'observability/**'
+    path: k8s/observability
   destination:
     server: https://kubernetes.default.svc
-    namespace: game-stora
+    namespace: hon-khana
   syncPolicy:
     automated:
       prune: true

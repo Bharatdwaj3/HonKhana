@@ -1,4 +1,4 @@
-namespace: game-stora
+namespace: hon-khana
 
 resources:
   - deployment/user-rollout.yaml
@@ -15,15 +15,15 @@ resources:
   - frontend-nginx-config.yaml
 
 images:
-  - name: game-stora-user
+  - name: hon-khana-user
     newName: ghcr.io/bharatdwaj3/refine-devops/user
     newTag: 0efd7ea
-  - name: game-stora-product
+  - name: hon-khana-product
     newName: ghcr.io/bharatdwaj3/refine-devops/product
     newTag: 0efd7ea
-  - name: game-stora-cart
+  - name: hon-khana-cart
     newName: ghcr.io/bharatdwaj3/refine-devops/cart
     newTag: 0efd7ea
-  - name: game-stora-frontend
+  - name: hon-khana-frontend
     newName: ghcr.io/bharatdwaj3/refine-devops/frontend
     newTag: 0efd7ea

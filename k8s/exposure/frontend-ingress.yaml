@@ -2,17 +2,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend-ingress
-  namespace: game-stora
+  namespace: hon-khana
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - gamestora.local
+        - hon-khana.local
       secretName: frontend-tls
   rules:
-    - host: gamestora.local
+    - host: hon-khana.local
       http:
         paths:
           - path: /

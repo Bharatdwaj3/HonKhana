@@ -1,4 +1,4 @@
-namespace: game-stora
+namespace: hon-khana
 
 resources:
   - frontend-ingress.yaml
