@@ -1,29 +1,38 @@
 namespace: hon-khana
 
 resources:
-  - deployment/user-rollout.yaml
-  - deployment/product-rollout.yaml
-  - deployment/cart-rollout.yaml
+  - deployment/catalog-rollout.yaml
+  - deployment/circulation-rollout.yaml
+  - deployment/members-rollout.yaml
   - deployment/frontend-rollout.yaml
-  - deployment/db-deployment.yaml
-  - deployment/mongo-data-persistentvolumeclaim.yaml
-  - service/user-service.yaml
-  - service/product-service.yaml
-  - service/cart-service.yaml
+
+  - deployment/catalog-data-persistentvolumeclaim.yaml
+  - deployment/circulation-data-persistentvolumeclaim.yaml
+  - deployment/members-persistentvolumeclaim.
+
+  - service/catalog-service.yaml
+  - service/circulation-service.yaml
+  - service/members-service.yaml
+
+  - service/catalog-db-service.yaml
+  - service/circulation-db-service.yaml
+  - service/members-db-service.yaml
+
   - service/frontend-service.yaml
-  - service/db-service.yaml
+  
+
   - frontend-nginx-config.yaml
 
 images:
-  - name: hon-khana-user
-    newName: ghcr.io/bharatdwaj3/refine-devops/user
+  - name: hon-khana-catalog
+    newName: ghcr.io/bharatdwaj3/honkhana/catalog
     newTag: 0efd7ea
-  - name: hon-khana-product
-    newName: ghcr.io/bharatdwaj3/refine-devops/product
+  - name: hon-khana-circulation
+    newName: ghcr.io/bharatdwaj3/honkhana/circulation
     newTag: 0efd7ea
-  - name: hon-khana-cart
-    newName: ghcr.io/bharatdwaj3/refine-devops/cart
+  - name: hon-khana-members
+    newName: ghcr.io/bharatdwaj3/honkhana/members
     newTag: 0efd7ea
   - name: hon-khana-frontend
-    newName: ghcr.io/bharatdwaj3/refine-devops/frontend
+    newName: ghcr.io/bharatdwaj3/honkhana/frontend
     newTag: 0efd7ea
