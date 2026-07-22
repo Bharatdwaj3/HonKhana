@@ -6,14 +6,15 @@ metadata:
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
-    io.kompose.service: frontend
-  name: frontend
+    io.kompose.service: circulation
+  name: circulation
 spec:
   ports:
-    - name: "5114"
-      port: 5114
-      targetPort: 80
+    - name: "4002"
+      port: 4002
+      targetPort: 4002
+      nodePort: 31002
   selector:
-    io.kompose.service: frontend
+    io.kompose.service: circulation
 status:
   loadBalancer: {}
