@@ -38,4 +38,4 @@ images:
     newTag: v3
   - name: ghcr.io/bharatdwaj3/frontend
     newName: ghcr.io/bharatdwaj3/frontend
-    newTag: v6
+    newTag: v5

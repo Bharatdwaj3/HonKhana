@@ -1,116 +1,125 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Mail, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import api from '../util/api';
-import { fetchUser } from '../store/avatarSlice';
 
 export default function Signup() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-    role: 'student', // default
+  const [formData, setFormData] = useState({
+    userName: '', fullName: '', email: '', accountType: 'reader', password: '', confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (formData.password !== formData.confirmPassword) return setError('Passwords do not match');
     setLoading(true);
-
     try {
-      const res = await api.post('/v1/auth/register', {
-        email: form.email,
-        password: form.password,
-        role: form.role,
-      });
-
-      // After successful registration, fetch user and redirect to profile completion
-      await dispatch(fetchUser());
-      navigate('/complete-profile');
+      await api.post('/v1/auth/register', formData);
+      navigate('/login', { state: { message: 'Success' } });
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed. Please try again.';
-      setError(msg);
-    } finally {
+      setError('Registration failed');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-card rounded-2xl border border-border shadow-lg p-8">
-        <h1 className="text-3xl font-black text-foreground text-center mb-2">Join HonKhana</h1>
-        <p className="text-foreground/60 text-sm text-center mb-6">Create your library account</p>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground/70 mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 bg-foreground/5 border border-border rounded-xl text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary transition-colors"
-              placeholder="you@example.com"
-            />
+  
+    <div className="min-h-screen w-full flex items-center justify-center bg-background p-4 md:p-6 pt-24 overflow-y-auto">
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col md:flex-row w-full max-w-4xl min-h-[550px] md:h-[min(650px,75vh)] rounded-3xl overflow-hidden shadow-2xl border border-border bg-card"
+      >
+        
+       
+        <div className="relative w-full md:w-[38%] bg-primary flex flex-col justify-center px-8 md:px-10 py-10 text-foreground shrink-0">
+          <div className="absolute top-6 left-8 flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-foreground" />
+            <span className="text-[9px] font-black uppercase tracking-[0.3em]">Augen</span>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-foreground/70 mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              className="w-full px-4 py-2.5 bg-foreground/5 border border-border rounded-xl text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary transition-colors"
-              placeholder="••••••••"
-            />
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-3 leading-none">Sign<br/>Up</h1>
+          <div className="w-10 h-1 bg-foreground mb-6" />
+          
+          <p className="text-[13px] font-light opacity-80 leading-relaxed max-w-[200px]">
+            Step into an unfiltered reality. Share your vision.
+          </p>
+
+          <div className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary border-[5px] border-card rounded-full items-center justify-center z-10 shadow-lg">
+            <ChevronRight className="text-foreground" size={18} />
+          </div>
+        </div>
+
+      
+        <div className="w-full md:w-[62%] p-8 md:p-12 flex flex-col relative overflow-hidden bg-card">
+          
+         
+          <div className="flex md:absolute md:top-8 md:right-8 mb-6 md:mb-0 self-end bg-background/50 rounded-full p-1 border border-border/50">
+            <button className="px-4 py-1 rounded-full text-[8px] font-bold tracking-widest bg-primary text-foreground">SIGN UP</button>
+            <Link to="/login" className="px-4 py-1 rounded-full text-[8px] font-bold tracking-widest text-foreground/40 hover:text-foreground">LOGIN</Link>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-foreground/70 mb-1">I am a...</label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 bg-foreground/5 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
-            >
-              <option value="student">Student</option>
-              <option value="faculty">Faculty</option>
-            </select>
+          <div className="flex-grow overflow-y-auto pr-1 custom-scrollbar flex flex-col justify-center">
+            <form onSubmit={handleSubmit} className="space-y-4 max-w-sm w-full">
+              {error && <p className="text-primary text-[9px] font-bold uppercase tracking-widest">{error}</p>}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-primary tracking-widest uppercase">Full Name</label>
+                  <input name="fullName" placeholder="John Doe" onChange={handleChange} className="w-full bg-transparent border-b border-border py-1.5 text-foreground focus:outline-none focus:border-primary transition-colors text-xs" required />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-primary tracking-widest uppercase">Username</label>
+                  <input name="userName" placeholder="johndoe" onChange={handleChange} className="w-full bg-transparent border-b border-border py-1.5 text-foreground focus:outline-none focus:border-primary transition-colors text-xs" required />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold text-primary tracking-widest uppercase">Email</label>
+                <input name="email" type="email" placeholder="hello@augen.com" onChange={handleChange} className="w-full bg-transparent border-b border-border py-1.5 text-foreground focus:outline-none focus:border-primary transition-colors text-xs" required />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1 relative">
+                  <label className="text-[9px] font-bold text-primary tracking-widest uppercase">Password</label>
+                  <input type={showPassword ? 'text' : 'password'} name="password" placeholder="••••••••" onChange={handleChange} className="w-full bg-transparent border-b border-border py-1.5 text-foreground focus:outline-none focus:border-primary transition-colors text-xs" required />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 bottom-1.5 text-foreground/20 hover:text-primary">
+                    {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
+                  </button>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-primary tracking-widest uppercase">Confirm</label>
+                  <input type="password" name="confirmPassword" placeholder="••••••••" onChange={handleChange} className="w-full bg-transparent border-b border-border py-1.5 text-foreground focus:outline-none focus:border-primary transition-colors text-xs" required />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold text-primary tracking-widest uppercase">Account Type</label>
+                <select name="accountType" onChange={handleChange} className="w-full bg-transparent border-b border-border py-1.5 text-foreground/60 focus:outline-none focus:border-primary transition-colors text-xs cursor-pointer">
+                  <option value="reader" className="bg-card">READER</option>
+                  <option value="creator" className="bg-card">CREATOR</option>
+                </select>
+              </div>
+
+              <button type="submit" disabled={loading} className="mt-4 w-full md:w-max px-8 py-3.5 bg-primary text-foreground text-[10px] font-black uppercase tracking-[0.25em] rounded hover:bg-accent transition-all">
+                {loading ? 'Creating...' : 'Register'}
+              </button>
+            </form>
+
+            <div className="mt-6 flex items-center gap-3">
+               <input type="checkbox" className="w-3.5 h-3.5 rounded border-border bg-transparent text-primary focus:ring-primary" required />
+               <span className="text-[9px] text-foreground/40 tracking-wider">I AGREE TO THE <Link to="/terms" className="text-foreground border-b border-foreground/20">TERMS</Link></span>
+            </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all font-semibold text-sm shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-foreground/60 mt-6">
-          Already have an account?{' '}
-          <Link to="/login" className="text-primary hover:underline font-medium">
-            Log in
-          </Link>
-        </p>
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

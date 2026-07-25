@@ -1,7 +1,6 @@
 
 import {Home, Explore, NewStory} from "./pages/index";
 import Profile from "./pages/Profile";
-import CompleteProfile from "./pages/CompleteProfile";
 import {Login, Signup} from "./auth/index";
 import {Navbar} from "./components/index";
 
@@ -24,7 +23,6 @@ function App() {
               <Route path="/login" element={<Login/>}/>
               <Route path="/signup" element={<Signup/>}/>
               <Route path="/profile" element={<Profile/>}/>
-        <Route path="/complete-profile" element={<CompleteProfile/>} />
 
               <Route path="/content" element={<ContentGrid/>}/>
               <Route path="/my-stories" element={<ContentGrid />} />
