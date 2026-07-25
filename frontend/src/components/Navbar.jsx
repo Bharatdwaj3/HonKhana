@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Menu, X, User, LogOut } from 'lucide-react';
+import { Search, Menu, X, User, LogOut, BookOpen, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchUser, clearUser } from '../store/avatarSlice';
 import api from '../util/api';
@@ -134,6 +134,22 @@ const Navbar = () => {
                           >
                             <User size={16} />
                             My Profile
+                          </Link>
+                          <Link
+                            to="/reader"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
+                          >
+                            <BookOpen size={16} />
+                            My Loans
+                          </Link>
+                          <Link
+                            to="/writer"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
+                          >
+                            <Users size={16} />
+                            Directory
                           </Link>
                         </div>
 
