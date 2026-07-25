@@ -142,7 +142,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    res.status(200).json(user);
+    res.status(200).json({ user });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get profile';
     res.status(500).json({ message });
