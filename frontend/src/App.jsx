@@ -1,5 +1,6 @@
 
 import {Home, Explore, NewStory} from "./pages/index";
+import Profile from "./pages/Profile";
 import {Login, Signup} from "./auth/index";
 import {Navbar} from "./components/index";
 
@@ -21,6 +22,7 @@ function App() {
               <Route path="/" element={<Home/>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/signup" element={<Signup/>}/>
+              <Route path="/profile" element={<Profile/>}/>
 
               <Route path="/content" element={<ContentGrid/>}/>
               <Route path="/my-stories" element={<ContentGrid />} />

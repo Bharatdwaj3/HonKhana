@@ -1,10 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Menu, X, User, LogOut, FileText, PenTool } from 'lucide-react';
+import { Search, Menu, X, User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchUser, clearUser } from '../store/avatarSlice';
 import api from '../util/api';
+
+const getProfile = (user) => user?.faculty || user?.student || null;
+
+const getDisplayName = (user) => {
+  const profile = getProfile(user);
+  if (profile) return `${profile.Fname} ${profile.Lname}`;
+  return user?.email || 'User';
+};
+
+const getInitial = (user) => {
+  const profile = getProfile(user);
+  if (profile?.Fname) return profile.Fname[0].toUpperCase();
+  return user?.email ? user.email[0].toUpperCase() : 'U';
+};
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -32,8 +46,6 @@ const Navbar = () => {
     }
   };
 
-  const getInitial = (name) => name ? name[0].toUpperCase() : 'U';
-
   if (loading) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
@@ -48,21 +60,12 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-20">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="text-2xl font-black tracking-tight text-foreground hover:text-primary transition-colors"
           >
-            Augen
+            HonKhana
           </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <Link 
-              to="/explore" 
-              className="text-sm font-semibold text-foreground/70 hover:text-primary transition-colors"
-            >
-              Explore
-            </Link>
-          </div>
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-foreground/5 border border-border rounded-xl hover:border-primary/30 transition-colors group">
@@ -71,12 +74,11 @@ const Navbar = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search stories..."
+                placeholder="Search books..."
                 className="bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none w-48"
               />
             </div>
 
-       
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               className="sm:hidden p-2 hover:bg-foreground/5 rounded-lg transition-colors"
@@ -84,7 +86,6 @@ const Navbar = () => {
               <Search size={20} className="text-foreground/60" />
             </button>
 
-            
             {user ? (
               <div className="relative">
                 <button
@@ -93,25 +94,24 @@ const Navbar = () => {
                 >
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center ring-2 ring-background font-bold text-sm text-primary">
                     {user.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.userName}
+                      <img
+                        src={user.avatar}
+                        alt={getDisplayName(user)}
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
-                      getInitial(user.userName)
+                      getInitial(user)
                     )}
                   </div>
                   <span className="hidden md:block text-sm font-semibold text-foreground">
-                    {user.userName}
+                    {getDisplayName(user)}
                   </span>
                 </button>
 
-               
                 <AnimatePresence>
                   {isMenuOpen && (
                     <>
-                      <div 
+                      <div
                         className="fixed inset-0 z-40"
                         onClick={() => setIsMenuOpen(false)}
                       />
@@ -122,37 +122,18 @@ const Navbar = () => {
                         className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50"
                       >
                         <div className="px-4 py-3 border-b border-border bg-foreground/[0.02]">
-                          <p className="font-semibold text-foreground text-sm">{user.fullName || user.userName}</p>
-                          <p className="text-xs text-foreground/50">@{user.userName}</p>
+                          <p className="font-semibold text-foreground text-sm">{getDisplayName(user)}</p>
+                          <p className="text-xs text-foreground/50 capitalize">{user.role}</p>
                         </div>
 
-                        
                         <div className="py-2">
                           <Link
-                            to={`/${user.accountType}`}
+                            to="/profile"
                             onClick={() => setIsMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
                           >
                             <User size={16} />
                             My Profile
-                          </Link>
-                          
-                          <Link
-                            to="/writer/new"
-                            onClick={() => setIsMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors md:hidden"
-                          >
-                            <PenTool size={16} />
-                            Write Story
-                          </Link>
-                          
-                          <Link
-                            to="/explore"
-                            onClick={() => setIsMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
-                          >
-                            <FileText size={16} />
-                            My Stories
                           </Link>
                         </div>
 
@@ -187,7 +168,6 @@ const Navbar = () => {
               </div>
             )}
 
-           
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 hover:bg-foreground/5 rounded-lg transition-colors"
@@ -201,7 +181,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        
         <AnimatePresence>
           {isSearchOpen && (
             <motion.div
@@ -216,7 +195,7 @@ const Navbar = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search stories..."
+                  placeholder="Search books..."
                   className="bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none flex-grow"
                   autoFocus
                 />
@@ -227,26 +206,6 @@ const Navbar = () => {
                   <X size={16} className="text-foreground/40" />
                 </button>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-       
-        <AnimatePresence>
-          {isMenuOpen && !user && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-border py-4 overflow-hidden"
-            >
-              <Link
-                to="/explore"
-                onClick={() => setIsMenuOpen(false)}
-                className="block px-4 py-3 text-sm font-semibold text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors rounded-lg"
-              >
-                Explore
-              </Link>
             </motion.div>
           )}
         </AnimatePresence>
