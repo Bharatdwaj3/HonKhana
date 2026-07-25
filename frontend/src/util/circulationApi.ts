@@ -2,7 +2,7 @@ import axios from 'axios';
 import membersApi from './membersApi';
 
 const circulationApi = axios.create({
-  baseURL: 'http://localhost:4002/api/v1',
+  baseURL: '/api/v1',
   withCredentials: true,
   timeout: 8000,
 });
@@ -26,3 +26,8 @@ circulationApi.interceptors.response.use(
 );
 
 export default circulationApi;
+// Loan routes
+export const borrowBook = (data) => circulationApi.post('/loan', data);
+export const returnBook = (id) => circulationApi.put(`/loan/${id}/return`);
+export const getMyLoans = () => circulationApi.get('/loan/mine');
+export const getAllLoans = () => circulationApi.get('/loan');

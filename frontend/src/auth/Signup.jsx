@@ -20,7 +20,7 @@ export default function Signup() {
     if (formData.password !== formData.confirmPassword) return setError('Passwords do not match');
     setLoading(true);
     try {
-      await api.post('/user/register', formData);
+      await api.post('/v1/auth/register', formData);
       navigate('/login', { state: { message: 'Success' } });
     } catch (err) {
       setError('Registration failed');

@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: catalog-db
-
 spec:
   replicas: 1
   selector:
@@ -17,17 +15,30 @@ spec:
         app: catalog-db
     spec:
       containers:
-        - envFrom:
-          - secretRef:
-              name: catalog-secrets 
+        - env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-secrets
+                  key: PgSql_User
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-secrets
+                  key: PgSql_Password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-secrets
+                  key: PgSql_Database
           image: postgres:15-alpine
           livenessProbe:
             exec:
               command:
-                - pg_isready 
+                - pg_isready
                 - -U
-                - catalog_user 
-                - -d 
+                - catalog_user
+                - -d
                 - catalog_db
             failureThreshold: 5
             initialDelaySeconds: 30
@@ -45,4 +56,4 @@ spec:
         - name: catalog-data
           persistentVolumeClaim:
             claimName: catalog-data
-
+status: {}

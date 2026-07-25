@@ -42,7 +42,6 @@ spec:
           name: members-ctr
           ports:
             - containerPort: 4003
-              hostPort: 4003
               protocol: TCP
           resources: {}
           readinessProbe:

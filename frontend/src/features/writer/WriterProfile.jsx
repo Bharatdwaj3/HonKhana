@@ -36,7 +36,7 @@ const WriterProfile = () => {
           setLoading(false);
           return;
         }
-        const { data } = await api.get("/user/profile");
+        const { data } = await api.get("/v1/auth/profile");
         setWriter(data);
         setLoading(false);
       } catch (e) {

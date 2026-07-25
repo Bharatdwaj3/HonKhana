@@ -5,7 +5,7 @@ export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get('/user/profile');
+      const res = await api.get('/v1/auth/profile');
       return res.data.user;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Failed to load user');

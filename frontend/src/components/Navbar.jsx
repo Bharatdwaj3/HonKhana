@@ -23,7 +23,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await api.post('/user/logout');
+      await api.post('/v1/auth/logout');
       dispatch(clearUser());
       setIsMenuOpen(false);
       navigate('/login');

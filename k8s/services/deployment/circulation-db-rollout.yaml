@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: circulation-db
-
 spec:
   replicas: 1
   selector:
@@ -17,17 +15,30 @@ spec:
         app-name: circulation-db
     spec:
       containers:
-        - envFrom:
-          - secretRef:
-              name: circulation-secrets 
+        - env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: circulation-secrets
+                  key: PgSql_User
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: circulation-secrets
+                  key: PgSql_Password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: circulation-secrets
+                  key: PgSql_Database
           image: postgres:15-alpine
           livenessProbe:
             exec:
               command:
-                - pg_isready -
-                - -U 
-                - circulation_user 
-                - -d 
+                - pg_isready
+                - -U
+                - circulation_user
+                - -d
                 - circulation_db
             failureThreshold: 5
             initialDelaySeconds: 30

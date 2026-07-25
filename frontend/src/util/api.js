@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: '/api',
   withCredentials: true,
   timeout: 8000,
 });
@@ -17,7 +17,7 @@ api.interceptors.response.use(
 
       try {
         console.log('Access token expired – trying to refresh login...');
-        await api.post('/refresh');
+        await api.post('/v1/auth/refresh');
         console.log('Refresh worked! Retrying original request...');
         return api(originalRequest);
       } catch (refreshError) {

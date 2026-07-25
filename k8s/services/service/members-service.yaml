@@ -6,15 +6,14 @@ metadata:
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
-    io.kompose.service: members
+    hon-khana-service: members
   name: members
 spec:
   ports:
     - name: "4003"
       port: 4003
       targetPort: 4003
-      nodePort: 31003
   selector:
-    io.kompose.service: members
+    hon-khana-service: members
 status:
   loadBalancer: {}

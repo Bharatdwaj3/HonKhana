@@ -24,7 +24,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await api.post('/user/login', formData);
+      await api.post('/v1/auth/login', formData);
       const userData = await dispatch(fetchUser()).unwrap();
       navigate(userData.accountType === 'reader' ? '/reader' : userData.accountType === 'creator' ? '/creator' : '/');
     } catch (err) {

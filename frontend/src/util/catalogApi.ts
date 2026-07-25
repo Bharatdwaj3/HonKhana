@@ -2,7 +2,7 @@ import axios from 'axios';
 import membersApi from './membersApi';
 
 const catalogApi = axios.create({
-  baseURL: 'http://localhost:4001/api/v1',
+  baseURL: '/api/v1',
   withCredentials: true,
   timeout: 8000,
 });
@@ -27,3 +27,16 @@ catalogApi.interceptors.response.use(
 );
 
 export default catalogApi;
+// Book routes
+export const getBooks = () => catalogApi.get('/book');
+export const getBook = (id) => catalogApi.get(`/book/${id}`);
+export const addBook = (data) => catalogApi.post('/book', data);
+export const updateBook = (id, data) => catalogApi.put(`/book/${id}`, data);
+export const deleteBook = (id) => catalogApi.delete(`/book/${id}`);
+export const adjustBookCopies = (id, data) => catalogApi.patch(`/book/${id}/copies`, data);
+
+// Storage routes
+export const uploadFile = (formData) => catalogApi.post('/storage/upload', formData);
+export const getFileUrl = (fileName) => catalogApi.get(`/storage/file/${fileName}`);
+export const listFiles = () => catalogApi.get('/storage/files');
+export const deleteFile = (fileName) => catalogApi.delete(`/storage/file/${fileName}`);
