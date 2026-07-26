@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Search, Menu, X, User, LogOut, BookOpen, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchUser, clearUser } from '../store/avatarSlice';
-import api from '../util/api';
+import { logoutUser } from '../util/membersApi';
 
 const getProfile = (user) => user?.faculty || user?.student || null;
 
@@ -37,12 +37,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await api.post('/v1/auth/logout');
+      await logoutUser();
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
       dispatch(clearUser());
       setIsMenuOpen(false);
       navigate('/login');
-    } catch (err) {
-      console.error('Logout failed:', err);
     }
   };
 
@@ -136,7 +137,7 @@ const Navbar = () => {
                             My Profile
                           </Link>
                           <Link
-                            to="/reader"
+                            to="/member"
                             onClick={() => setIsMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
                           >
@@ -144,7 +145,7 @@ const Navbar = () => {
                             My Loans
                           </Link>
                           <Link
-                            to="/writer"
+                            to="/staff"
                             onClick={() => setIsMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
                           >

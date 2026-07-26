@@ -7,6 +7,7 @@ import { getBooks } from '../../util/catalogApi';
 export default function ContentGrid({ limit = 20, genreFilter = null }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,9 +19,13 @@ export default function ContentGrid({ limit = 20, genreFilter = null }) {
           data = data.filter((book) => book.genre?.includes(genreFilter));
         }
         setBooks(data.slice(0, limit));
+        setError('');
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setError(err.response ? 'Something went wrong on our end.' : "Can't reach the server — check your network.");
+        setLoading(false);
+      });
   }, [limit, genreFilter]);
 
   if (loading) {
@@ -96,6 +101,7 @@ export default function ContentGrid({ limit = 20, genreFilter = null }) {
           </motion.article>
         ))}
       </motion.div>
+      {error && <p className="text-sm text-primary text-center mt-6">{error}</p>}
     </div>
   );
 }

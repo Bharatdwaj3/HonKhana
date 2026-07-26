@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../util/api.js';
+import { getProfile } from '../util/membersApi';
 
 export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get('/v1/auth/profile');
+      const res = await getProfile();
       return res.data.user;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Failed to load user');

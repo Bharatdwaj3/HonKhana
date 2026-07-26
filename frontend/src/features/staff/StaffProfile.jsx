@@ -16,7 +16,7 @@ import {
 const SUBJECTS = ['Geography', 'Social_Studies', 'Computer_Science', 'Literature', 'History'];
 const emptyForm = { email: '', Fname: '', Lname: '', age: '', gender: '', Expertise: SUBJECTS[0], Subjects: SUBJECTS[0] };
 
-const WriterProfile = () => {
+const StaffProfile = () => {
   const { user } = useSelector((state) => state.avatar);
   const [activeTab, setActiveTab] = useState('faculty');
   const [facultyList, setFacultyList] = useState([]);
@@ -31,15 +31,18 @@ const WriterProfile = () => {
   const [formData, setFormData] = useState(emptyForm);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [deleteError, setDeleteError] = useState('');
 
   const fetchDirectory = async () => {
     setLoading(true);
+    setError('');
     try {
       const [facultyRes, studentRes] = await Promise.all([getFacultyList(), getStudentList()]);
       setFacultyList(facultyRes.data);
       setStudentList(studentRes.data);
     } catch (err) {
-      console.error('Failed to fetch directory:', err);
+      setError(err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.');
     } finally {
       setLoading(false);
     }
@@ -58,6 +61,7 @@ const WriterProfile = () => {
     const confirmed = window.confirm(`Remove this ${type}? This can't be undone.`);
     if (!confirmed) return;
     setDeletingId(id);
+    setDeleteError('');
     try {
       if (type === 'faculty') {
         await deleteFaculty(id);
@@ -66,7 +70,7 @@ const WriterProfile = () => {
       }
       await fetchDirectory();
     } catch (err) {
-      console.error(`Failed to delete ${type}:`, err);
+      setDeleteError(err.response?.data?.message || (err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.'));
     } finally {
       setDeletingId(null);
     }
@@ -160,6 +164,8 @@ const WriterProfile = () => {
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-black tracking-tight mb-8">Directory</h1>
+        {error && <p className="text-sm text-primary mb-6">{error}</p>}
+        {deleteError && <p className="text-sm text-primary mb-6">{deleteError}</p>}
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-2">
@@ -415,4 +421,4 @@ const WriterProfile = () => {
   );
 };
 
-export default WriterProfile;
+export default StaffProfile;

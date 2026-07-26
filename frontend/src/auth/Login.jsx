@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { fetchUser } from '../store/avatarSlice';
 import { Mail, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import api from '../util/api';
+import { loginUser } from '../util/membersApi';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -24,7 +24,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await api.post('/v1/auth/login', formData);
+      await loginUser(formData);
       const userData = await dispatch(fetchUser()).unwrap();
       navigate(userData.accountType === 'reader' ? '/reader' : userData.accountType === 'creator' ? '/creator' : '/');
     } catch (err) {

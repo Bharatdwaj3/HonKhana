@@ -12,6 +12,7 @@ const ContentDetails = () => {
   const [loading, setLoading] = useState(true);
   const [borrowing, setBorrowing] = useState(false);
   const [borrowMessage, setBorrowMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -20,8 +21,12 @@ const ContentDetails = () => {
         setBook(res.data);
         setLoading(false);
       } catch (err) {
-        console.error(err);
-        navigate('/content', { replace: true });
+        if (err.response?.status === 404) {
+          navigate("/content", { replace: true });
+        } else {
+          setError(err.response ? "Something went wrong on our end." : "Cannot reach the server - check your network.");
+          setLoading(false);
+        }
       }
     };
     fetchBook();
@@ -40,6 +45,20 @@ const ContentDetails = () => {
       setBorrowing(false);
     }
   };
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 text-center">
+        <p className="text-sm text-primary mb-4">{error}</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 bg-card border border-border rounded-lg text-sm font-semibold text-foreground/70 hover:text-primary hover:border-primary transition-all"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
 
   if (loading || !book) {
     return (

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { store } from '../store/store';
+import { clearUser } from '../store/avatarSlice';
 
 const membersApi = axios.create({
   baseURL: '/api/v1',
@@ -10,13 +12,16 @@ membersApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await membersApi.post('/auth/refresh');
         return membersApi(originalRequest);
       } catch (refreshError) {
+        store.dispatch(clearUser());
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }
@@ -25,6 +30,7 @@ membersApi.interceptors.response.use(
 );
 
 export default membersApi;
+
 // Auth routes (beyond what api.js already handles)
 export const registerUser = (data) => membersApi.post('/auth/register', data);
 export const loginUser = (data) => membersApi.post('/auth/login', data);

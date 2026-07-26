@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../util/api';
+import { registerUser, loginUser } from '../util/membersApi';
 import { fetchUser } from '../store/avatarSlice';
 
 export default function Signup() {
@@ -26,7 +26,7 @@ export default function Signup() {
 
     try {
       // Step 1: create the account
-      await api.post('/v1/auth/register', {
+      await registerUser( {
         email: form.email,
         password: form.password,
         role: form.role,
@@ -34,7 +34,7 @@ export default function Signup() {
 
       // Step 2: register() does not auto-login, so log in right after
       // with the same credentials to establish the session
-      await api.post('/v1/auth/login', {
+      await loginUser( {
         email: form.email,
         password: form.password,
       });

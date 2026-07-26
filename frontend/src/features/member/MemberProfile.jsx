@@ -4,10 +4,12 @@ import { BookOpen, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { getMyLoans, returnBook } from '../../util/circulationApi';
 import { getBook } from '../../util/catalogApi';
 
-const ReaderProfile = () => {
+const MemberProfile = () => {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [returningId, setReturningId] = useState(null);
+  const [error, setError] = useState('');
+  const [returnError, setReturnError] = useState('');
 
   const fetchLoans = async () => {
     setLoading(true);
@@ -24,8 +26,9 @@ const ReaderProfile = () => {
         })
       );
       setLoans(loansWithBooks);
+      setError('');
     } catch (err) {
-      console.error('Failed to fetch loans:', err);
+      setError(err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.');
     } finally {
       setLoading(false);
     }
@@ -37,11 +40,12 @@ const ReaderProfile = () => {
 
   const handleReturn = async (loanId) => {
     setReturningId(loanId);
+    setReturnError('');
     try {
       await returnBook(loanId);
       await fetchLoans();
     } catch (err) {
-      console.error('Failed to return book:', err);
+      setReturnError(err.response?.data?.message || (err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.'));
     } finally {
       setReturningId(null);
     }
@@ -61,6 +65,8 @@ const ReaderProfile = () => {
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-black tracking-tight mb-8">My Loans</h1>
+        {error && <p className="text-sm text-primary mb-6">{error}</p>}
+        {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
 
         {loans.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
@@ -130,4 +136,4 @@ const ReaderProfile = () => {
   );
 };
 
-export default ReaderProfile;
+export default MemberProfile;

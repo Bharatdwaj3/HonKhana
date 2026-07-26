@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import api from '../util/api';
+import { completeProfile } from '../util/membersApi';
 import { fetchUser } from '../store/avatarSlice';
 
 const SUBJECTS = ['Geography', 'Social_Studies', 'Computer_Science', 'Literature', 'History'];
@@ -35,7 +35,7 @@ export default function CompleteProfile() {
     setLoading(true);
 
     try {
-      await api.post('/v1/auth/profile', {
+      await completeProfile( {
         email: form.email,
         Fname: form.Fname,
         Lname: form.Lname,
