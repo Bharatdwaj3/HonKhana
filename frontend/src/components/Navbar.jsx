@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Menu, X, User, LogOut, BookOpen, Users } from 'lucide-react';
+import { Search, Menu, X, User, LogOut, BookOpen, Users, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchUser, clearUser } from '../store/avatarSlice';
 import { logoutUser } from '../util/membersApi';
@@ -152,6 +152,16 @@ const Navbar = () => {
                             <Users size={16} />
                             Directory
                           </Link>
+                          {user?.role === "admin" && (
+                            <Link
+                              to="/admin"
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
+                            >
+                              <Shield size={16} />
+                              Admin Dashboard
+                            </Link>
+                          )}
                         </div>
 
                         <div className="border-t border-border py-2">

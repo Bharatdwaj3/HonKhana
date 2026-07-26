@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, GraduationCap, User, Trash2, Pencil, Plus, X, ChevronDown, Loader2 } from 'lucide-react';
+import { Search, GraduationCap, User, Trash2, Pencil, Plus, X, ChevronDown, Loader2, BookOpen, Users } from 'lucide-react';
 import {
   getFacultyList,
   getStudentList,
   deleteFaculty,
   deleteStudent,
+  updateUserRole,
   addFaculty,
   addStudent,
   updateFacultyProfile,
@@ -16,8 +18,9 @@ import {
 const SUBJECTS = ['Geography', 'Social_Studies', 'Computer_Science', 'Literature', 'History'];
 const emptyForm = { email: '', Fname: '', Lname: '', age: '', gender: '', Expertise: SUBJECTS[0], Subjects: SUBJECTS[0] };
 
-const StaffProfile = () => {
+const AdminProfile = () => {
   const { user } = useSelector((state) => state.avatar);
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('faculty');
   const [facultyList, setFacultyList] = useState([]);
   const [studentList, setStudentList] = useState([]);
@@ -52,10 +55,10 @@ const StaffProfile = () => {
     fetchDirectory();
   }, []);
 
-  const canManageFaculty = user?.role === 'admin' || user?.role === 'faculty';
-  const canManageStudent = user?.role === 'admin';
-  const canAddFaculty = user?.role === 'admin';
-  const canAddStudent = user?.role === 'admin' || user?.role === 'faculty';
+  const handleRoleChange = async (id, newRole) => {
+    if (!window.confirm(`Change user role to ${newRole}?`)) return;
+    try { await updateUserRole({ id, role: newRole }); fetchDirectory(); } catch (err) { alert('Role update failed'); }
+  };
 
   const handleDelete = async (id, type) => {
     const confirmed = window.confirm(`Remove this ${type}? This can't be undone.`);
@@ -158,14 +161,39 @@ const StaffProfile = () => {
     );
   }
 
-  const canAdd = activeTab === 'faculty' ? canAddFaculty : canAddStudent;
-
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-black tracking-tight mb-8">Directory</h1>
+        <h1 className="text-3xl font-black tracking-tight mb-8">Admin Dashboard</h1>
         {error && <p className="text-sm text-primary mb-6">{error}</p>}
         {deleteError && <p className="text-sm text-primary mb-6">{deleteError}</p>}
+
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <button
+            onClick={() => navigate('/staff/new')}
+            className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl hover:border-primary transition-all text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <BookOpen size={18} className="text-primary" />
+            </div>
+            <div>
+              <p className="font-bold text-sm">Manage Books</p>
+              <p className="text-xs text-foreground/50">Add, edit, or remove catalog items</p>
+            </div>
+          </button>
+          <button
+            onClick={() => navigate('/member')}
+            className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl hover:border-primary transition-all text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Users size={18} className="text-primary" />
+            </div>
+            <div>
+              <p className="font-bold text-sm">System Loans</p>
+              <p className="text-xs text-foreground/50">View and manage every active loan</p>
+            </div>
+          </button>
+        </div>
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-2">
@@ -191,7 +219,7 @@ const StaffProfile = () => {
             </button>
           </div>
 
-          {canAdd && !showForm && (
+          {!showForm && (
             <button
               onClick={openAddForm}
               className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all"
@@ -342,7 +370,6 @@ const StaffProfile = () => {
           <div className="space-y-3">
             {filteredList.map((person) => {
               const isExpanded = expandedId === person.id;
-              const canManage = activeTab === 'faculty' ? canManageFaculty : canManageStudent;
               return (
                 <motion.div
                   key={person.id}
@@ -384,29 +411,41 @@ const StaffProfile = () => {
                         </div>
                       </div>
 
-                      {canManage && (
-                        <div className="flex gap-3 mt-4">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditForm(person);
-                            }}
-                            className="flex items-center gap-2 px-4 py-2 bg-foreground/5 border border-border rounded-xl text-sm font-semibold hover:border-primary transition-all"
+                      <div className="flex gap-3 mt-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditForm(person);
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-foreground/5 border border-border rounded-xl text-sm font-semibold hover:border-primary transition-all"
+                        >
+                          <Pencil size={14} />
+                          Edit
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(person.id, activeTab);
+                          }}
+                          disabled={deletingId === person.id}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-500/20 transition-all disabled:opacity-50"
+                        >
+                          <Trash2 size={14} />
+                          {deletingId === person.id ? 'Removing...' : 'Remove'}
+                        </button>
+                      </div>
+
+                      {person.id !== user.id && (
+                        <div className="mt-4 pt-4 border-t border-border flex items-center gap-3">
+                          <span className="text-xs font-bold uppercase text-foreground/40">Change Role:</span>
+                          <select
+                            onChange={(e) => handleRoleChange(person.id, e.target.value)}
+                            defaultValue={activeTab === 'faculty' ? 'faculty' : 'student'}
+                            className="bg-background border border-border rounded-lg px-2 py-1 text-xs font-semibold focus:border-primary outline-none"
                           >
-                            <Pencil size={14} />
-                            Edit
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(person.id, activeTab);
-                            }}
-                            disabled={deletingId === person.id}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-500/20 transition-all disabled:opacity-50"
-                          >
-                            <Trash2 size={14} />
-                            {deletingId === person.id ? 'Removing...' : 'Remove'}
-                          </button>
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty</option>
+                          </select>
                         </div>
                       )}
                     </div>
@@ -421,4 +460,4 @@ const StaffProfile = () => {
   );
 };
 
-export default StaffProfile;
+export default AdminProfile;

@@ -1,12 +1,12 @@
-const Forbidden = () => {
+import ErrorScreen from '../components/ErrorScreen';
+import SternFace from '../components/SternFace';
+export default function Forbidden() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-black tracking-tight mb-3">Access denied</h1>
-        <p className="text-foreground/60">You don't have permission to view this page.</p>
-      </div>
-    </div>
+    <ErrorScreen
+      icon={<SternFace />}
+      code="403"
+      title="Access denied."
+      message="You don't have permission to view this page."
+    />
   );
-};
-
-export default Forbidden;
+}

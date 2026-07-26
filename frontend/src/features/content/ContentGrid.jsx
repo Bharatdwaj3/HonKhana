@@ -89,12 +89,6 @@ export default function ContentGrid({ limit = 20, genreFilter = null }) {
                 <button onClick={(e) => handleDeleteBook(book.id, e)} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Trash2 size={14} /></button>
               </div>
             )}
-            {user?.role === "admin" && (
-              <div className="absolute top-3 right-3 flex gap-2 z-10">
-                <button onClick={(e) => { e.stopPropagation(); navigate(`/staff/new?edit=${book.id}`); }} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Pencil size={14} /></button>
-                <button onClick={(e) => handleDeleteBook(book.id, e)} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Trash2 size={14} /></button>
-              </div>
-            )}
               {book.genre?.[0] && (
                 <div className="absolute top-3 left-3">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card/95 backdrop-blur-sm border border-border text-xs font-semibold text-foreground/70">

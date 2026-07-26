@@ -6,6 +6,7 @@ export const protectedRoutes = {
   '/complete-profile': 'any',
   '/member': 'any',
   '/staff': ['admin', 'faculty'],
-  '/staff/new': ['admin', 'faculty'], // assumption - confirm this matches /writer
+  '/staff/new': ['admin', 'faculty'],
+  '/admin': ['admin'],
   '/content/crud': ['admin', 'faculty'],
 };

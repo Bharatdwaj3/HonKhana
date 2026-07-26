@@ -13,7 +13,8 @@ import {Navbar} from "./components/index";
 import  {   
      ContentGrid, ContentDetails, ContentTab, 
     MemberProfile,
-    StaffProfile
+    StaffProfile,
+    AdminProfile
 } from "./features/index";
 
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
@@ -40,6 +41,7 @@ function App() {
 
               <Route path="/member" element={<ProtectedRoute path="/member"><MemberProfile /></ProtectedRoute>} />
               <Route path="/staff" element={<ProtectedRoute path="/staff"><StaffProfile /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute path="/admin"><AdminProfile /></ProtectedRoute>} />
               <Route path="/staff/new" element={<ProtectedRoute path="/staff/new"><NewStory /></ProtectedRoute>} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               <Route path="/forbidden" element={<Forbidden />} />
