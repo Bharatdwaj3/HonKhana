@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { getMyLoans, returnBook } from '../../util/circulationApi';
+import { getMyLoans, getAllLoans, returnBook } from '../../util/circulationApi';
+import { useSelector } from 'react-redux';
 import { getBook } from '../../util/catalogApi';
 
 const MemberProfile = () => {
@@ -14,7 +15,8 @@ const MemberProfile = () => {
   const fetchLoans = async () => {
     setLoading(true);
     try {
-      const res = await getMyLoans();
+      const { user } = useSelector(state => state.avatar);
+      const res = user?.role === 'admin' ? await getAllLoans() : await getMyLoans();
       const loansWithBooks = await Promise.all(
         res.data.map(async (loan) => {
           try {
@@ -64,7 +66,7 @@ const MemberProfile = () => {
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-black tracking-tight mb-8">My Loans</h1>
+        <h1 className="text-3xl font-black tracking-tight mb-8">{user?.role === 'admin' ? 'System Loans' : 'My Loans'}</h1>
         {error && <p className="text-sm text-primary mb-6">{error}</p>}
         {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
 

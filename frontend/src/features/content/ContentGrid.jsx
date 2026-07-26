@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Tag } from 'lucide-react';
-import { getBooks } from '../../util/catalogApi';
+import { getBooks, deleteBook } from '../../util/catalogApi';
+import { Pencil, Trash2 } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 export default function ContentGrid({ limit = 20, genreFilter = null }) {
   const [books, setBooks] = useState([]);
+  const { user } = useSelector(state => state.avatar);
+  const handleDeleteBook = async (id, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Delete this book permanently?')) return;
+    try { await deleteBook(id); setBooks(prev => prev.filter(b => b.id !== id)); } catch (err) { alert('Failed to delete book'); }
+  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -75,6 +83,18 @@ export default function ContentGrid({ limit = 20, genreFilter = null }) {
                   <BookOpen size={48} className="text-foreground/20" strokeWidth={1.5} />
                 </div>
               )}
+            {user?.role === "admin" && (
+              <div className="absolute top-3 right-3 flex gap-2 z-10">
+                <button onClick={(e) => { e.stopPropagation(); navigate(`/staff/new?edit=${book.id}`); }} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Pencil size={14} /></button>
+                <button onClick={(e) => handleDeleteBook(book.id, e)} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Trash2 size={14} /></button>
+              </div>
+            )}
+            {user?.role === "admin" && (
+              <div className="absolute top-3 right-3 flex gap-2 z-10">
+                <button onClick={(e) => { e.stopPropagation(); navigate(`/staff/new?edit=${book.id}`); }} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Pencil size={14} /></button>
+                <button onClick={(e) => handleDeleteBook(book.id, e)} className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"><Trash2 size={14} /></button>
+              </div>
+            )}
               {book.genre?.[0] && (
                 <div className="absolute top-3 left-3">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card/95 backdrop-blur-sm border border-border text-xs font-semibold text-foreground/70">

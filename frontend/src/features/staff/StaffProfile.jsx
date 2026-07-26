@@ -6,7 +6,7 @@ import {
   getFacultyList,
   getStudentList,
   deleteFaculty,
-  deleteStudent,
+  deleteStudent, updateUserRole,
   addFaculty,
   addStudent,
   updateFacultyProfile,
@@ -57,6 +57,10 @@ const StaffProfile = () => {
   const canAddFaculty = user?.role === 'admin';
   const canAddStudent = user?.role === 'admin' || user?.role === 'faculty';
 
+  const handleRoleChange = async (id, newRole) => {
+    if (!window.confirm(`Change user role to ${newRole}?`)) return;
+    try { await updateUserRole({ id, role: newRole }); fetchDirectory(); } catch (err) { alert('Role update failed'); }
+  };
   const handleDelete = async (id, type) => {
     const confirmed = window.confirm(`Remove this ${type}? This can't be undone.`);
     if (!confirmed) return;
