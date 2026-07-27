@@ -11,11 +11,11 @@ const MemberProfile = () => {
   const [returningId, setReturningId] = useState(null);
   const [error, setError] = useState('');
   const [returnError, setReturnError] = useState('');
+  const { user } = useSelector(state => state.avatar);
 
   const fetchLoans = async () => {
     setLoading(true);
     try {
-      const { user } = useSelector(state => state.avatar);
       const res = user?.role === 'admin' ? await getAllLoans() : await getMyLoans();
       const loansWithBooks = await Promise.all(
         res.data.map(async (loan) => {
