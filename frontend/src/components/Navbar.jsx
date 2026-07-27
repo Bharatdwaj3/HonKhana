@@ -28,11 +28,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
   useEffect(() => {
-    if (localStorage.getItem('accessToken') || document.cookie.includes('accessToken')) {
-      dispatch(fetchUser());
-    }
+    dispatch(fetchUser());
   }, [dispatch]);
 
   const handleLogout = async () => {
