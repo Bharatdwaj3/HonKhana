@@ -28,7 +28,7 @@ const getBook = async (req: Request<{ id: string }>, res: Response): Promise<voi
 
 const registerBook = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { title, author, publisher, isbn, genre, totalCopies, coverUrl } = req.body;
+    const { title, author, publisher, isbn, genre, totalCopies, coverUrl, pdfUrl } = req.body;
 
     if (!title || !author || !isbn) {
       res.status(400).json({ message: "title, author, and isbn are required" });
@@ -43,6 +43,7 @@ const registerBook = async (req: AuthRequest, res: Response): Promise<void> => {
         totalCopies: copies,
         availableCopies: copies,
         coverUrl,
+        pdfUrl,
         addedByUserId: req.user?.id,
       },
     });
@@ -59,10 +60,10 @@ const registerBook = async (req: AuthRequest, res: Response): Promise<void> => {
 
 const updateBook = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
-    const { title, author, publisher, isbn, genre, totalCopies, coverUrl } = req.body;
+    const { title, author, publisher, isbn, genre, totalCopies, coverUrl, pdfUrl } = req.body;
     const book = await prisma.book.update({
       where: { id: Number(req.params.id) },
-      data: { title, author, publisher, isbn, genre, totalCopies, coverUrl },
+      data: { title, author, publisher, isbn, genre, totalCopies, coverUrl, pdfUrl },
     });
     res.status(200).json(book);
   } catch (error) {

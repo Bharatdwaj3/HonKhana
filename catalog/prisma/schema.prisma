@@ -42,6 +42,7 @@ model book {
   totalCopies     Int       @default(1)
   availableCopies Int       @default(1)
   coverUrl        String?
+  pdfUrl          String?
   addedByUserId   Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
