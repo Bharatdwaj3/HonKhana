@@ -5,6 +5,8 @@ import { ArrowLeft, Loader2, AlertTriangle, BookOpen } from 'lucide-react';
 import { getMyLoans, returnBook, renewBook } from '../util/circulationApi';
 import { getBook } from '../util/catalogApi';
 
+const MAX_RENEWALS = 2; // must match circulation/controller/loan.controller.ts
+
 export default function MyLoans() {
   const navigate = useNavigate();
   const [loans, setLoans] = useState([]);
@@ -157,11 +159,13 @@ export default function MyLoans() {
                           </div>
                           <button
                             onClick={() => handleRenew(loan.id)}
-                            disabled={renewingId === loan.id}
+                            disabled={renewingId === loan.id || loan.renewalCount >= MAX_RENEWALS}
                             className="px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-semibold hover:bg-foreground/5 transition-colors disabled:opacity-50 flex-shrink-0"
                           >
                             {renewingId === loan.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : loan.renewalCount >= MAX_RENEWALS ? (
+                              'Limit Reached'
                             ) : (
                               'Renew'
                             )}

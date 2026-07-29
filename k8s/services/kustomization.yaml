@@ -32,7 +32,7 @@ images:
     newTag: v1
   - name: circulation
     newName: ghcr.io/bharatdwaj3/circulation
-    newTag: v2
+    newTag: v3
   - name: members
     newName: ghcr.io/bharatdwaj3/members
     newTag: v3

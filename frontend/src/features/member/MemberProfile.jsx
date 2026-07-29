@@ -55,6 +55,8 @@ const MemberProfile = () => {
 
   const isOverdue = (loan) => !loan.returnedAt && new Date(loan.dueAt) < new Date();
 
+  const totalFinesOwed = loans.reduce((sum, loan) => sum + (loan.fineAmount || 0), 0);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -69,6 +71,13 @@ const MemberProfile = () => {
         <h1 className="text-3xl font-black tracking-tight mb-8">{user?.role === 'admin' ? 'System Loans' : 'My Loans'}</h1>
         {error && <p className="text-sm text-primary mb-6">{error}</p>}
         {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
+
+        {totalFinesOwed > 0 && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6 flex items-center justify-between">
+            <span className="text-sm font-semibold text-red-500">Total Fines Owed</span>
+            <span className="text-lg font-black text-red-500">₹{totalFinesOwed}</span>
+          </div>
+        )}
 
         {loans.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
@@ -117,6 +126,11 @@ const MemberProfile = () => {
                         <AlertCircle size={12} /> Overdue
                       </span>
                     ) : null}
+                    {loan.fineAmount > 0 && (
+                      <span className="inline-flex items-center gap-1 text-xs text-red-500 mt-1 font-semibold">
+                        Fine: ₹{loan.fineAmount}
+                      </span>
+                    )}
                   </div>
 
                   {!loan.returnedAt && (

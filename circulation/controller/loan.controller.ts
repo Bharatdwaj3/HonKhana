@@ -6,6 +6,7 @@ import { CATALOG_SERVICE_URL, INTERNAL_SERVICE_SECRET } from "../config/env.conf
 import type { Response as ExpressResponse } from "express";
 
 const LOAN_PERIOD_DAYS = 14;
+const MAX_RENEWALS = 2;
 const FINE_PER_DAY = 5;
 
 // Adds isOverdue / daysOverdue to a loan without storing them in the DB —
@@ -176,6 +177,11 @@ const renewBook = async (req: AuthRequest, res: ExpressResponse): Promise<void> 
     }
     if (loan.userId !== userId && !isAdmin) {
       res.status(403).json({ message: "You can only renew your own loans" });
+      return;
+    }
+
+    if (loan.renewalCount >= MAX_RENEWALS) {
+      res.status(400).json({ message: `You have reached the maximum of ${MAX_RENEWALS} renewals for this loan` });
       return;
     }
 
