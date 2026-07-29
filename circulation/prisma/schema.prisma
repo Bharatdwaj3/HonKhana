@@ -19,5 +19,6 @@ model loan {
   borrowedAt DateTime  @default(now())
   dueAt      DateTime
   returnedAt DateTime?
-  fineAmount Float     @default(0)
+  fineAmount Float     @default(0) 
+  renewalCount    Int       @default(0)
 }

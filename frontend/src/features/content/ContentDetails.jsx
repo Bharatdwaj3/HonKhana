@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy } from 'lucide-react';
+import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy, FileText } from 'lucide-react';
 import { getBook } from '../../util/catalogApi';
 import { borrowBook as borrowBookRequest } from '../../util/circulationApi';
 
@@ -17,138 +17,106 @@ const ContentDetails = () => {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const res = await getBook(id);
-        setBook(res.data);
-        setLoading(false);
+        const { data } = await getBook(id);
+        setBook(data);
       } catch (err) {
-        if (err.response?.status === 404) {
-          navigate("/content", { replace: true });
-        } else {
-          setError(err.response ? "Something went wrong on our end." : "Cannot reach the server - check your network.");
-          setLoading(false);
-        }
+        setError('Failed to load book details');
+      } finally {
+        setLoading(false);
       }
     };
     fetchBook();
-  }, [id, navigate]);
+  }, [id]);
 
   const handleBorrow = async () => {
     setBorrowing(true);
     setBorrowMessage('');
     try {
-      await borrowBookRequest({ bookId: book.id });
-      setBorrowMessage('Borrowed! Check My Loans to see it.');
-      setBook({ ...book, availableCopies: book.availableCopies - 1 });
+      await borrowBookRequest({ bookId: Number(id) });
+      setBorrowMessage('Book borrowed successfully!');
+      const { data } = await getBook(id);
+      setBook(data);
     } catch (err) {
-      setBorrowMessage(err.response?.data?.message || 'Could not borrow this book.');
+      setBorrowMessage(err.response?.data?.message || 'Failed to borrow book');
     } finally {
       setBorrowing(false);
     }
   };
-  if (error) {
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 text-center">
-        <p className="text-sm text-primary mb-4">{error}</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-card border border-border rounded-lg text-sm font-semibold text-foreground/70 hover:text-primary hover:border-primary transition-all"
-        >
-          Go Back
-        </button>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-
-  if (loading || !book) {
+  if (error || !book) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-6">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error || 'Book not found'}</p>
+          <button onClick={() => navigate(-1)} className="text-primary hover:underline flex items-center gap-2">
+            <ArrowLeft size={16} /> Go Back
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
-      <div className="max-w-3xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-4 py-2 mb-6 bg-card border border-border rounded-lg text-sm font-semibold text-foreground/70 hover:text-primary hover:border-primary transition-all"
-        >
-          <ArrowLeft size={16} /> Back
+      <div className="max-w-4xl mx-auto">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-foreground/60 hover:text-foreground mb-8 transition-colors">
+          <ArrowLeft size={20} /> Back to Catalog
         </button>
 
-        <motion.article
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-card rounded-2xl border border-border shadow-xl overflow-hidden"
-        >
-          <div className="flex flex-col md:flex-row gap-8 p-8 md:p-12">
-            <div className="w-40 h-56 rounded-xl bg-foreground/5 overflow-hidden flex-shrink-0 mx-auto md:mx-0">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div className="md:col-span-4">
+            <div className="aspect-[2/3] rounded-2xl overflow-hidden border border-border shadow-2xl bg-card">
               {book.coverUrl ? (
-                <img src={book.coverUrl} className="w-full h-full object-cover" alt={book.title} />
+                <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary/10 to-accent/10">
-                  <BookOpen size={40} className="text-foreground/20" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <BookOpen size={64} className="text-foreground/10" />
                 </div>
               )}
-            </div>
-
-            <div className="flex-1">
-              {book.genre?.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {book.genre.map((g) => (
-                    <span
-                      key={g}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider"
-                    >
-                      <Tag size={12} />
-                      {g.replace('_', ' ')}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3">
-                {book.title}
-              </h1>
-              <p className="text-lg text-foreground/60 mb-6">by {book.author}</p>
-
-              <div className="space-y-3 text-sm text-foreground/70">
-                <div className="flex items-center gap-2.5">
-                  <Building2 size={16} className="text-foreground/40" />
-                  <span>{book.publisher}</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Hash size={16} className="text-foreground/40" />
-                  <span>ISBN: {book.isbn}</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Copy size={16} className="text-foreground/40" />
-                  <span>
-                    {book.availableCopies} of {book.totalCopies} copies available
-                  </span>
-                </div>
-              </div>
-
-              {borrowMessage && (
-                <p className="mt-4 text-sm font-semibold text-primary">{borrowMessage}</p>
-              )}
-
-              <button
-                onClick={handleBorrow}
-                disabled={book.availableCopies < 1 || borrowing}
-                className="mt-8 px-6 py-3 bg-primary text-white rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {borrowing
-                  ? 'Borrowing...'
-                  : book.availableCopies > 0
-                  ? 'Borrow This Book'
-                  : 'Currently Unavailable'}
-              </button>
             </div>
           </div>
-        </motion.article>
+
+          <div className="md:col-span-8 flex flex-col">
+            <h1 className="text-4xl font-black tracking-tight mb-2">{book.title}</h1>
+            <p className="text-xl text-foreground/60 mb-6 font-medium">{book.author}</p>
+
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="space-y-4 text-foreground/70">
+                <div className="flex items-center gap-3"><Building2 size={18} /><span>{book.publisher}</span></div>
+                <div className="flex items-center gap-3"><Hash size={18} /><span>ISBN: {book.isbn}</span></div>
+              </div>
+              <div className="space-y-4 text-foreground/70">
+                <div className="flex items-center gap-3"><Tag size={18} />
+                  <div className="flex flex-wrap gap-1">
+                    {book.genre.map(g => <span key={g} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{g.replace('_', ' ')}</span>)}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3"><Copy size={18} /><span>{book.availableCopies} of {book.totalCopies} copies available</span></div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-4 mt-auto pt-8 border-t border-border">
+              <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
+                {borrowing ? 'Borrowing...' : 'Borrow Book'}
+              </button>
+
+              {book.pdfUrl && (
+                <button onClick={() => navigate(`/read/${id}`)} className="flex items-center gap-2 px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-all">
+                  <FileText size={20} /> Read Now
+                </button>
+              )}
+            </div>
+            {borrowMessage && <p className={`mt-4 text-sm font-medium ${borrowMessage.includes('success') ? 'text-green-500' : 'text-red-500'}`}>{borrowMessage}</p>}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -30,4 +30,5 @@ export default circulationApi;
 export const borrowBook = (data) => circulationApi.post('/loan', data);
 export const returnBook = (id) => circulationApi.put(`/loan/${id}/return`);
 export const getMyLoans = () => circulationApi.get('/loan/mine');
+export const renewBook = (id) => circulationApi.put(`/loan/${id}/renew`);
 export const getAllLoans = () => circulationApi.get('/loan');

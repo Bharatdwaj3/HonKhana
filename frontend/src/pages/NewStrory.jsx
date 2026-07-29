@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Loader2, ShieldAlert } from 'lucide-react';
-import { addBook } from '../util/catalogApi';
+import { addBook, uploadFile, extractPdf } from '../util/catalogApi';
 
 const GENRES = [
   'FICTION', 'NON_FICTION', 'FANTASY', 'SCIENCE', 'SCIENCE_FICTION',
@@ -15,6 +15,7 @@ export default function NewStory() {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.avatar);
   const [saving, setSaving] = useState(false);
+  const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     title: '',
@@ -24,8 +25,11 @@ export default function NewStory() {
     genre: [],
     totalCopies: 1,
     availableCopies: 1,
-    coverUrl: '',
   });
+  const [pdfFile, setPdfFile] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
+  const [suggestedCoverUrl, setSuggestedCoverUrl] = useState(null);
+  const [useSuggestedCover, setUseSuggestedCover] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,6 +44,41 @@ export default function NewStory() {
     }));
   };
 
+  const handlePdfChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPdfFile(file);
+    setExtracting(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { data } = await extractPdf(formData);
+      // Only fill fields the user hasn't already typed into
+      setForm((prev) => ({
+        ...prev,
+        title: prev.title || data.title || '',
+        author: prev.author || data.author || '',
+      }));
+      if (data.suggestedCoverUrl) {
+        setSuggestedCoverUrl(data.suggestedCoverUrl);
+        setUseSuggestedCover(true);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to read PDF');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCoverFile(file);
+      setUseSuggestedCover(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -49,10 +88,28 @@ export default function NewStory() {
     }
     setSaving(true);
     try {
+      let coverUrl = useSuggestedCover ? suggestedCoverUrl : '';
+      if (coverFile && !useSuggestedCover) {
+        const fd = new FormData();
+        fd.append('file', coverFile);
+        const { data } = await uploadFile(fd);
+        coverUrl = data.url;
+      }
+
+      let pdfUrl = '';
+      if (pdfFile) {
+        const fd = new FormData();
+        fd.append('file', pdfFile);
+        const { data } = await uploadFile(fd);
+        pdfUrl = data.url;
+      }
+
       await addBook({
         ...form,
         totalCopies: Number(form.totalCopies),
         availableCopies: Number(form.availableCopies),
+        coverUrl,
+        pdfUrl,
       });
       navigate('/content');
     } catch (err) {
@@ -165,13 +222,45 @@ export default function NewStory() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground/70 mb-1">Cover Image URL (optional)</label>
+              <label className="block text-sm font-medium text-foreground/70 mb-1">Book PDF (optional)</label>
               <input
-                name="coverUrl"
-                value={form.coverUrl}
-                onChange={handleChange}
-                placeholder="https://..."
-                className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:border-primary transition-colors"
+                type="file"
+                accept="application/pdf"
+                onChange={handlePdfChange}
+                className="w-full text-sm text-foreground/70 file:mr-3 file:px-4 file:py-2 file:rounded-xl file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold file:cursor-pointer cursor-pointer"
+              />
+              {extracting && (
+                <p className="text-xs text-foreground/50 mt-1.5 flex items-center gap-1.5">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Reading title, author, and cover from PDF...
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground/70 mb-1">Cover Image (optional)</label>
+              {suggestedCoverUrl && (
+                <div className="mb-2 flex items-center gap-3">
+                  <img
+                    src={suggestedCoverUrl}
+                    alt="Suggested cover from PDF"
+                    className="h-20 w-14 object-cover rounded-lg border border-border"
+                  />
+                  <label className="flex items-center gap-2 text-xs text-foreground/70">
+                    <input
+                      type="checkbox"
+                      checked={useSuggestedCover}
+                      onChange={(e) => setUseSuggestedCover(e.target.checked)}
+                    />
+                    Use this cover from the PDF
+                  </label>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleCoverChange}
+                className="w-full text-sm text-foreground/70 file:mr-3 file:px-4 file:py-2 file:rounded-xl file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold file:cursor-pointer cursor-pointer"
               />
             </div>
 

@@ -12,8 +12,13 @@ export const PgSql_Host = process.env.PgSql_Host || 'circulation-db';
 export const PgSql_Port = process.env.PgSql_Port || '5432';
 const EPword = encodeURIComponent(PgSql_Password);
 export const DATABASE_URL = `postgresql://${PgSql_User}:${EPword}@${PgSql_Host}:${PgSql_Port}/${PgSql_Database}?schema=public`;
+console.error('[DEBUG] user=' + JSON.stringify(PgSql_User) + ' host=' + JSON.stringify(PgSql_Host) + ' port=' + JSON.stringify(PgSql_Port) + ' db=' + JSON.stringify(PgSql_Database) + ' pwLen=' + PgSql_Password.length + ' pwEncodedLen=' + EPword.length);
 if (!DATABASE_URL) throw new Error('DATABASE_URL is missing from .env');
 
 if (!JWT_ACC_SECRECT) throw new Error('JWT_ACC_SECRECT is missing from .env');
 if (!CATALOG_SERVICE_URL) throw new Error('CATALOG_SERVICE_URL is missing from .env');
 if (!INTERNAL_SERVICE_SECRET) throw new Error('INTERNAL_SERVICE_SECRET is missing from .env');
+export const MEMBERS_SERVICE_URL = process.env.MEMBERS_SERVICE_URL as string;
+export const MAILHOG_HOST = process.env.MAILHOG_HOST || 'mailhog';
+export const MAILHOG_PORT = Number(process.env.MAILHOG_PORT) || 1025;
+if (!MEMBERS_SERVICE_URL) throw new Error('MEMBERS_SERVICE_URL is missing from .env');

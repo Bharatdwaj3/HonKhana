@@ -18,3 +18,5 @@ export const DATABASE_URL = `postgresql://${PgSql_User}:${EPword}@${PgSql_Host}:
 if (!JWT_ACC_SECRECT) throw new Error('JWT_ACC_SECRECT is missing from .env');
 if (!JWT_REF_SECRECT) throw new Error('JWT_REF_SECRECT is missing from .env');
 if (!DATABASE_URL) throw new Error('DATABASE_URL is missing from .env');
+export const INTERNAL_SERVICE_SECRET = process.env.INTERNAL_SERVICE_SECRET as string;
+if (!INTERNAL_SERVICE_SECRET) throw new Error('INTERNAL_SERVICE_SECRET is missing from .env');

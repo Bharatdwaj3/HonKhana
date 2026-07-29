@@ -1,5 +1,5 @@
 
-import {Home, Explore, NewStory} from "./pages/index";
+import {Home, Explore, NewStory, MyLoans, PdfViewer} from "./pages/index";
 import Profile from "./pages/Profile";
 import CompleteProfile from "./pages/CompleteProfile";
 import NotFound from "./pages/NotFound";
@@ -43,6 +43,8 @@ function App() {
               <Route path="/staff" element={<ProtectedRoute path="/staff"><StaffProfile /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute path="/admin"><AdminProfile /></ProtectedRoute>} />
               <Route path="/staff/new" element={<ProtectedRoute path="/staff/new"><NewStory /></ProtectedRoute>} />
+              <Route path="/my-loans" element={<ProtectedRoute path="/my-loans"><MyLoans /></ProtectedRoute>} />
+              <Route path="/read/:id" element={<ProtectedRoute path="/read/:id"><PdfViewer /></ProtectedRoute>} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               <Route path="/forbidden" element={<Forbidden />} />
               <Route path="*" element={<NotFound />} />

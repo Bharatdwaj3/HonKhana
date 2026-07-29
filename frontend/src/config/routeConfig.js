@@ -5,6 +5,8 @@ export const protectedRoutes = {
   '/profile': 'any',
   '/complete-profile': 'any',
   '/member': 'any',
+  '/my-loans': 'any',
+  '/read/:id': 'any',
   '/staff': ['admin', 'faculty'],
   '/staff/new': ['admin', 'faculty'],
   '/admin': ['admin'],
