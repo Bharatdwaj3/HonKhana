@@ -34,6 +34,8 @@ export const addBook = (data) => catalogApi.post('/book', data);
 export const updateBook = (id, data) => catalogApi.put(`/book/${id}`, data);
 export const deleteBook = (id) => catalogApi.delete(`/book/${id}`);
 export const adjustBookCopies = (id, data) => catalogApi.patch(`/book/${id}/copies`, data);
+export const getNewArrivals = (limit = 10) => catalogApi.get(`/book/new-arrivals?limit=${limit}`);
+export const getSimilarBooks = (id) => catalogApi.get(`/book/${id}/similar`);
 
 // Storage routes
 export const uploadFile = (formData) => catalogApi.post('/storage/upload', formData);

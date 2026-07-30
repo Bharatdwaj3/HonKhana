@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import loanRoutes from './routes/loan.routes.ts';
+import internalRoutes from './routes/internal.routes.ts';
 import { PORT, FRONTEND_ORIGIN } from './config/env.config.ts';
 import { startReminderCron } from './jobs/reminder.job.ts';
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/v1/loan', loanRoutes);
+app.use('/api/v1/internal', internalRoutes);
 
 app.listen(PORT, () => {
   console.log(`Circulation service running on port ${PORT}`);

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Footer } from "../layout/index";
 import { Hero } from "../components/Hero";
 import { ValueProp } from "../components/ValueProp";
-import ContentGrid from "../features/content/ContentGrid";
+import NewArrivals from "../features/content/NewArrivals";
 
 export default function Home() {
   return (
@@ -18,16 +18,14 @@ export default function Home() {
       <section className="pb-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-12 mb-12 flex items-center gap-4">
           <span className="text-xs font-bold tracking-widest uppercase text-foreground/60">
-            Recent Posts
+            New Arrivals
           </span>
           <div className="h-px flex-1 bg-border" />
         </div>
-
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <ContentGrid limit={8} featuredOnly={false} itemsPerPage={8} />
+          <NewArrivals limit={8} />
         </div>
       </section>
-
       <Footer />
     </main>
   );

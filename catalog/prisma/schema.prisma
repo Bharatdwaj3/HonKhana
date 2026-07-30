@@ -46,5 +46,6 @@ model book {
   addedByUserId   Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  featured        Boolean   @default(false)
   deletedAt       DateTime?
 }
