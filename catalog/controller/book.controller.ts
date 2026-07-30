@@ -176,4 +176,40 @@ const getTrending = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { listBooks, getBook, registerBook, updateBook, removeBook, adjustCopies, getNewArrivals, getSimilarBooks, getTrending };
+const bulkSetFeatured = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { ids, featured } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ message: "ids must be a non-empty array" });
+      return;
+    }
+    if (typeof featured !== "boolean") {
+      res.status(400).json({ message: "featured must be a boolean" });
+      return;
+    }
+
+    const result = await prisma.book.updateMany({
+      where: { id: { in: ids.map(Number) } },
+      data: { featured },
+    });
+
+    res.status(200).json({ updated: result.count });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to update featured status";
+    res.status(500).json({ message });
+  }
+};
+
+const getFeatured = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const books = await prisma.book.findMany({
+      where: { featured: true, deletedAt: null },
+    });
+    res.status(200).json(books);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to fetch featured books";
+    res.status(500).json({ message });
+  }
+};
+
+export { listBooks, getBook, registerBook, updateBook, removeBook, adjustCopies, getNewArrivals, getSimilarBooks, getTrending, bulkSetFeatured, getFeatured };
