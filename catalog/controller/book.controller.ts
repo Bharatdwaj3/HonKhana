@@ -145,7 +145,8 @@ const getSimilarBooks = async (req: Request<{ id: string }>, res: Response): Pro
 const getTrending = async (req: Request, res: Response): Promise<void> => {
   try {
     const limit = Number(req.query.limit) || 10;
-    const loanCountsRes = await fetch(`${CIRCULATION_SERVICE_URL}/api/v1/internal/loan-counts`, {
+    const days = Number(req.query.days) || 7;
+    const loanCountsRes = await fetch(`${CIRCULATION_SERVICE_URL}/api/v1/internal/loan-counts?days=${days}`, {
       headers: { "x-internal-secret": INTERNAL_SERVICE_SECRET },
     });
     if (!loanCountsRes.ok) {

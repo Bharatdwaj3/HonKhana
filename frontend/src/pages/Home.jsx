@@ -1,11 +1,21 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import { Footer } from "../layout/index";
 import { Hero } from "../components/Hero";
 import { ValueProp } from "../components/ValueProp";
-import NewArrivals from "../features/content/NewArrivals";
+import SimilarBooksRow from "../features/content/SimilarBooksRow";
+import { getTrending, getFeatured, getNewArrivals } from "../util/catalogApi";
 
 export default function Home() {
+  const [trending, setTrending] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
+
+  useEffect(() => {
+    getTrending(12, 7).then((res) => setTrending(res.data)).catch(() => setTrending([]));
+    getFeatured().then((res) => setFeatured(res.data)).catch(() => setFeatured([]));
+    getNewArrivals(12).then((res) => setNewArrivals(res.data)).catch(() => setNewArrivals([]));
+  }, []);
+
   return (
     <main className="bg-background text-foreground selection:bg-primary/20">
       <div className="pt-20">
@@ -15,17 +25,13 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <ValueProp />
       </section>
-      <section className="pb-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-12 mb-12 flex items-center gap-4">
-          <span className="text-xs font-bold tracking-widest uppercase text-foreground/60">
-            New Arrivals
-          </span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-        <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <NewArrivals limit={8} />
-        </div>
-      </section>
+
+      <div className="mx-auto max-w-7xl px-6 lg:px-12 pb-24 space-y-4">
+        <SimilarBooksRow title="Trending This Week" books={trending} />
+        <SimilarBooksRow title="Featured" books={featured} />
+        <SimilarBooksRow title="New Arrivals" books={newArrivals} />
+      </div>
+
       <Footer />
     </main>
   );

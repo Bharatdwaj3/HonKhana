@@ -1,12 +1,19 @@
 import prisma from '../config/prisma-client.ts';
 import type { Request, Response } from 'express';
 
-// Returns borrow counts per book across ALL loans (past + present),
-// used by the catalog service to rank "Trending" books.
+// Returns borrow counts per book. Optionally scoped to the last N days
+// (e.g. ?days=7 for "trending this week") via the borrowedAt timestamp.
+// With no `days` param, counts across all-time loan history.
 export const getLoanCounts = async (req: Request, res: Response): Promise<void> => {
   try {
+    const days = req.query.days ? Number(req.query.days) : null;
+    const where = days
+      ? { borrowedAt: { gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } }
+      : {};
+
     const counts = await prisma.loan.groupBy({
       by: ['bookId'],
+      where,
       _count: { bookId: true },
       orderBy: { _count: { bookId: 'desc' } },
     });
