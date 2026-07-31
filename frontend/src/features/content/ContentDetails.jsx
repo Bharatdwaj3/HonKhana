@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy, FileText } from 'lucide-react';
-import { getBook } from '../../util/catalogApi';
+import { getBook, getSimilarBooks } from '../../util/catalogApi';
 import { borrowBook as borrowBookRequest } from '../../util/circulationApi';
+import SimilarBooksRow from './SimilarBooksRow';
 
 const ContentDetails = () => {
   const { id } = useParams();
@@ -13,12 +14,21 @@ const ContentDetails = () => {
   const [borrowing, setBorrowing] = useState(false);
   const [borrowMessage, setBorrowMessage] = useState('');
   const [error, setError] = useState('');
+  const [similarByAuthor, setSimilarByAuthor] = useState([]);
+  const [similarByGenre, setSimilarByGenre] = useState([]);
 
   useEffect(() => {
     const fetchBook = async () => {
       try {
         const { data } = await getBook(id);
         setBook(data);
+        getSimilarBooks(id).then((res) => {
+          setSimilarByAuthor(res.data.byAuthor || []);
+          setSimilarByGenre(res.data.byGenre || []);
+        }).catch(() => {
+          setSimilarByAuthor([]);
+          setSimilarByGenre([]);
+        });
       } catch (err) {
         setError('Failed to load book details');
       } finally {
@@ -117,6 +127,8 @@ const ContentDetails = () => {
             {borrowMessage && <p className={`mt-4 text-sm font-medium ${borrowMessage.includes('success') ? 'text-green-500' : 'text-red-500'}`}>{borrowMessage}</p>}
           </div>
         </div>
+        <SimilarBooksRow title="More by this author" books={similarByAuthor} />
+        <SimilarBooksRow title="More in this genre" books={similarByGenre} />
       </div>
     </div>
   );

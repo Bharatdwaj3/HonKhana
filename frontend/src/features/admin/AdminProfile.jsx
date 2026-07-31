@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, GraduationCap, User, Trash2, Pencil, Plus, X, ChevronDown, Loader2, BookOpen, Users } from 'lucide-react';
+import { Search, GraduationCap, User, Trash2, Pencil, Plus, X, ChevronDown, Loader2, BookOpen, Users, Star } from 'lucide-react';
+import { getBooks, setBulkFeatured } from '../../util/catalogApi';
 import {
   getFacultyList,
   getStudentList,
@@ -36,6 +37,22 @@ const AdminProfile = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [deleteError, setDeleteError] = useState('');
+  const [bookList, setBookList] = useState([]);
+  const [selectedBookIds, setSelectedBookIds] = useState(new Set());
+  const [bulkSaving, setBulkSaving] = useState(false);
+
+  const fetchBooks = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const { data } = await getBooks();
+      setBookList(data);
+    } catch (err) {
+      setError(err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchDirectory = async () => {
     setLoading(true);
@@ -91,6 +108,8 @@ const AdminProfile = () => {
     setSearchQuery('');
     setExpandedId(null);
     setShowForm(false);
+    setSelectedBookIds(new Set());
+    if (tab === 'books') fetchBooks();
   };
 
   const openAddForm = () => {
@@ -161,6 +180,116 @@ const AdminProfile = () => {
     );
   }
 
+  const toggleBookSelection = (id) => {
+    setSelectedBookIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkFeatured = async (featured) => {
+    if (selectedBookIds.size === 0) return;
+    setBulkSaving(true);
+    setError('');
+    try {
+      await setBulkFeatured({ ids: Array.from(selectedBookIds), featured });
+      await fetchBooks();
+      setSelectedBookIds(new Set());
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update featured status');
+    } finally {
+      setBulkSaving(false);
+    }
+  };
+
+  if (activeTab === 'books') {
+    return (
+      <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-black tracking-tight mb-8">Admin Dashboard</h1>
+          {error && <p className="text-sm text-primary mb-6">{error}</p>}
+
+          <div className="flex gap-2 mb-6">
+            <button
+              onClick={() => handleTabChange('faculty')}
+              className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-card border border-border text-foreground/60 hover:border-primary"
+            >
+              Faculty
+            </button>
+            <button
+              onClick={() => handleTabChange('student')}
+              className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-card border border-border text-foreground/60 hover:border-primary"
+            >
+              Student
+            </button>
+            <button
+              onClick={() => handleTabChange('books')}
+              className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-primary text-white border border-primary"
+            >
+              Books
+            </button>
+          </div>
+
+          {selectedBookIds.size > 0 && (
+            <div className="flex items-center gap-3 mb-4 p-3 bg-card border border-border rounded-xl">
+              <span className="text-sm font-semibold text-foreground/70">{selectedBookIds.size} selected</span>
+              <button
+                onClick={() => handleBulkFeatured(true)}
+                disabled={bulkSaving}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+              >
+                <Star size={14} /> Add to Featured
+              </button>
+              <button
+                onClick={() => handleBulkFeatured(false)}
+                disabled={bulkSaving}
+                className="px-3 py-1.5 bg-card border border-border rounded-lg text-xs font-semibold hover:border-primary transition-all disabled:opacity-50"
+              >
+                Remove from Featured
+              </button>
+            </div>
+          )}
+
+          {bookList.length === 0 ? (
+            <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
+              <BookOpen size={32} className="mx-auto mb-3 text-foreground/20" />
+              No books found.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {bookList.map((book) => (
+                <div
+                  key={book.id}
+                  onClick={() => toggleBookSelection(book.id)}
+                  className="bg-card rounded-xl border border-border p-4 flex items-center gap-4 cursor-pointer hover:border-primary transition-all"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedBookIds.has(book.id)}
+                    onChange={() => toggleBookSelection(book.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-4 h-4 flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold truncate">{book.title}</p>
+                    <p className="text-sm text-foreground/60 truncate">{book.author}</p>
+                  </div>
+                  {book.featured && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-primary flex-shrink-0">
+                      <Star size={14} fill="currentColor" /> Featured
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
@@ -216,6 +345,16 @@ const AdminProfile = () => {
               }`}
             >
               Student
+            </button>
+            <button
+              onClick={() => handleTabChange('books')}
+              className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                activeTab === 'books'
+                  ? 'bg-primary text-white border border-primary'
+                  : 'bg-card border border-border text-foreground/60 hover:border-primary'
+              }`}
+            >
+              Books
             </button>
           </div>
 

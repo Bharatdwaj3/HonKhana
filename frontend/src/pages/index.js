@@ -3,6 +3,7 @@ import Explore from './Explore';
 import NewStory from './NewStrory';
 import MyLoans from './MyLoans';
 import PdfViewer from './PdfViewer';
+import ComingSoon from './ComingSoon';
 export {
-    Home, Explore, NewStory, MyLoans, PdfViewer
+    Home, Explore, NewStory, MyLoans, PdfViewer, ComingSoon
 };

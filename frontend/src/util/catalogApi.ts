@@ -36,6 +36,9 @@ export const deleteBook = (id) => catalogApi.delete(`/book/${id}`);
 export const adjustBookCopies = (id, data) => catalogApi.patch(`/book/${id}/copies`, data);
 export const getNewArrivals = (limit = 10) => catalogApi.get(`/book/new-arrivals?limit=${limit}`);
 export const getSimilarBooks = (id) => catalogApi.get(`/book/${id}/similar`);
+export const getTrending = (limit = 10) => catalogApi.get(`/book/trending?limit=${limit}`);
+export const getFeatured = () => catalogApi.get('/book/featured');
+export const setBulkFeatured = (data) => catalogApi.patch('/book/bulk-featured', data);
 
 // Storage routes
 export const uploadFile = (formData) => catalogApi.post('/storage/upload', formData);
