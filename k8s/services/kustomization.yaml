@@ -14,6 +14,7 @@ resources:
   - deployment/catalog-data-persistentvolumeclaim.yaml
   - deployment/circulation-data-persistentvolumeclaim.yaml
   - deployment/members-data-persistentvolumeclaim.yaml
+  - deployment/firebase-data-persistentvolumeclaim.yaml
 
   - service/catalog-service.yaml
   - service/circulation-service.yaml
@@ -42,7 +43,7 @@ images:
     newTag: v3
   - name: firebase
     newName: ghcr.io/bharatdwaj3/firebase
-    newTag: v1
+    newTag: v2
   - name: ghcr.io/bharatdwaj3/frontend
     newName: ghcr.io/bharatdwaj3/frontend
     newTag: v22

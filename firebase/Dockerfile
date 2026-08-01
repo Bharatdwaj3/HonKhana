@@ -8,4 +8,5 @@ WORKDIR /app
 COPY firebase.json ./
 COPY storage.rules ./
 EXPOSE 9099 9199 4000
-CMD ["firebase", "emulators:start", "--only", "auth,storage", "--project", "demo-project"]
+RUN mkdir -p /data
+CMD ["firebase", "emulators:start", "--only", "auth,storage", "--project", "demo-project", "--import=/data", "--export-on-exit=/data"]
