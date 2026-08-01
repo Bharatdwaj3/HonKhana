@@ -15,7 +15,7 @@ membersApi.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        await membersApi.post('/auth/refresh');
+        await membersApi.post('/auth/refresh', {}, { _retry: true });
         return membersApi(originalRequest);
       } catch (refreshError) {
         store.dispatch(clearUser());
