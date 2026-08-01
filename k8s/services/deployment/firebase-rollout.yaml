@@ -38,7 +38,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh", "-c", "firebase emulators:export /data --project demo-project --force"]
+                command: ["/bin/sh", "-c", "firebase emulators:export /data/export --project demo-project --force"]
           readinessProbe:
             tcpSocket:
               port: 9199
