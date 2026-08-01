@@ -6,6 +6,7 @@ resources:
   - deployment/members-rollout.yaml
   - deployment/frontend-rollout.yaml
   - deployment/firebase-rollout.yaml
+  - deployment/mailhog-rollout.yaml
   - deployment/catalog-db-rollout.yaml
   - deployment/circulation-db-rollout.yaml
   - deployment/members-db-rollout.yaml
@@ -24,6 +25,7 @@ resources:
 
   - service/frontend-service.yaml
   - service/firebase-service.yaml
+  - service/mailhog-service.yaml
   
 
   - service/frontend-nginx-config.yaml
