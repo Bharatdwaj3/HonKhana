@@ -130,6 +130,36 @@ export const extractPdf = async (req: AuthRequest, res: Response): Promise<void>
     let author = info.info?.Author?.trim() || '';
     const pageCount = info.total || null;
 
+    // --- Extract text from first few pages for ISBN/Publisher scanning ---
+    const parser2 = new PDFParse({ data: file.buffer });
+    const textResult = await parser2.getText({ first: 3 });
+    await parser2.destroy();
+    const rawText = textResult.text || '';
+
+    function isValidISBN13(digits: string): boolean {
+      const sum = digits.split('').reduce((acc, d, i) =>
+        acc + Number(d) * (i % 2 === 0 ? 1 : 3), 0);
+      return sum % 10 === 0;
+    }
+    function isValidISBN10(chars: string): boolean {
+      const sum = chars.split('').reduce((acc, c, i) => {
+        const val = c.toUpperCase() === 'X' ? 10 : Number(c);
+        return acc + val * (10 - i);
+      }, 0);
+      return sum % 11 === 0;
+    }
+
+    const isbnCandidates = rawText.match(/(?:ISBN(?:-1[03])?:?\s*)?(97[89][-\s]?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d|\d{9}[\dXx])/g) || [];
+    let isbn: string | null = null;
+    for (const raw of isbnCandidates) {
+      const clean = raw.replace(/[^0-9Xx]/g, '');
+      if (clean.length === 13 && isValidISBN13(clean)) { isbn = clean; break; }
+      if (clean.length === 10 && isValidISBN10(clean)) { isbn = clean; break; }
+    }
+
+    const publisherMatch = rawText.match(/Publish(?:ed by|er)[:\s]+([A-Z][A-Za-z0-9&.,\s]{2,60})/i);
+    const publisher = publisherMatch ? publisherMatch[1].trim() : null;
+
     // 2. Fall back to the filename if metadata is missing (e.g. "Dune - Frank Herbert.pdf")
     if (!title || !author) {
       const nameWithoutExt = file.originalname.replace(/\.pdf$/i, '');
@@ -171,7 +201,7 @@ export const extractPdf = async (req: AuthRequest, res: Response): Promise<void>
       console.error('Cover generation failed:', coverError);
     }
 
-    res.status(200).json({ title, author, pageCount, suggestedCoverUrl });
+    res.status(200).json({ title, author, isbn, publisher, pageCount, suggestedCoverUrl });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to extract PDF data';
     res.status(500).json({ message });
