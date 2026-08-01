@@ -5,6 +5,7 @@ metadata:
   namespace: hon-khana
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: "300m"
 spec:
   ingressClassName: nginx
   tls:

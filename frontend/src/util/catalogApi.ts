@@ -41,8 +41,8 @@ export const getFeatured = () => catalogApi.get('/book/featured');
 export const setBulkFeatured = (data) => catalogApi.patch('/book/bulk-featured', data);
 
 // Storage routes
-export const uploadFile = (formData) => catalogApi.post('/storage/upload', formData);
-export const extractPdf = (formData) => catalogApi.post('/storage/extract', formData);
+export const uploadFile = (formData) => catalogApi.post('/storage/upload', formData, { timeout: 300000 });
+export const extractPdf = (formData) => catalogApi.post('/storage/extract', formData, { timeout: 300000 });
 export const getFileUrl = (fileName) => catalogApi.get(`/storage/file/${fileName}`);
 export const listFiles = () => catalogApi.get('/storage/files');
 export const deleteFile = (fileName) => catalogApi.delete(`/storage/file/${fileName}`);
