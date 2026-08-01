@@ -35,6 +35,10 @@ spec:
           volumeMounts:
             - name: firebase-data
               mountPath: /data
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "firebase emulators:export /data --project demo-project --force"]
           readinessProbe:
             tcpSocket:
               port: 9199
@@ -46,4 +50,5 @@ spec:
           persistentVolumeClaim:
             claimName: firebase-data
       restartPolicy: Always
+      terminationGracePeriodSeconds: 30
 status: {}
