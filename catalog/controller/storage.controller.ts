@@ -41,7 +41,7 @@ export const uploadFile = async (req: AuthRequest, res: Response): Promise<void>
     });
 
     blobStream.on('finish', async () => {
-      const publicUrl = `http://localhost:9199/${storage.name}/${fileName}`;
+      const publicUrl = `/firebase-storage/${storage.name}/${fileName}`;
       
       res.status(200).json({
         message: 'File uploaded successfully',
@@ -69,7 +69,7 @@ export const getFileUrl = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    const publicUrl = `http://localhost:9199/${storage.name}/${fileName}`;
+    const publicUrl = `/firebase-storage/${storage.name}/${fileName}`;
     res.status(200).json({ url: publicUrl });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get file';
@@ -195,7 +195,7 @@ export const extractPdf = async (req: AuthRequest, res: Response): Promise<void>
         blobStream.end(coverBuffer);
       });
 
-      suggestedCoverUrl = `http://localhost:9199/${storage.name}/${coverFileName}`;
+      suggestedCoverUrl = `/firebase-storage/${storage.name}/${coverFileName}`;
     } catch (coverError) {
       // Cover generation is a "nice to have" — text metadata still returns if this fails
       console.error('Cover generation failed:', coverError);
