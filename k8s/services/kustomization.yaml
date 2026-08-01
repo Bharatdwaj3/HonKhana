@@ -5,6 +5,7 @@ resources:
   - deployment/circulation-rollout.yaml
   - deployment/members-rollout.yaml
   - deployment/frontend-rollout.yaml
+  - deployment/firebase-rollout.yaml
   - deployment/catalog-db-rollout.yaml
   - deployment/circulation-db-rollout.yaml
   - deployment/members-db-rollout.yaml
@@ -22,6 +23,7 @@ resources:
   - service/members-db-service.yaml
 
   - service/frontend-service.yaml
+  - service/firebase-service.yaml
   
 
   - service/frontend-nginx-config.yaml
@@ -36,6 +38,9 @@ images:
   - name: members
     newName: ghcr.io/bharatdwaj3/members
     newTag: v3
+  - name: firebase
+    newName: ghcr.io/bharatdwaj3/firebase
+    newTag: v1
   - name: ghcr.io/bharatdwaj3/frontend
     newName: ghcr.io/bharatdwaj3/frontend
     newTag: v21
