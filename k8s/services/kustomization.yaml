@@ -29,7 +29,7 @@ resources:
 images:
   - name: catalog
     newName: ghcr.io/bharatdwaj3/catalog
-    newTag: v3
+    newTag: v4
   - name: circulation
     newName: ghcr.io/bharatdwaj3/circulation
     newTag: v4
