@@ -64,7 +64,12 @@ const Navbar = () => {
           >
             HonKhana
           </Link>
-
+          <Link
+            to="/explore"
+            className="hidden sm:block text-sm font-semibold text-foreground/70 hover:text-primary transition-colors"
+          >
+            Explore
+          </Link>
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-foreground/5 border border-border rounded-xl hover:border-primary/30 transition-colors group">
               <Search size={18} className="text-foreground/40 group-hover:text-primary transition-colors" />
