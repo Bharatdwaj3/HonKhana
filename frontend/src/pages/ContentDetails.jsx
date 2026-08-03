@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy, FileText } from 'lucide-react';
-import { getBook, getSimilarBooks } from '../../util/catalogApi';
-import { borrowBook as borrowBookRequest } from '../../util/circulationApi';
-import SimilarBooksRow from './SimilarBooksRow';
+import { getBook, getSimilarBooks } from '../util/catalogApi';
+import { borrowBook as borrowBookRequest } from '../util/circulationApi';
+import SimilarBooksRow from '../components/SimilarBooksRow';
 
 const ContentDetails = () => {
   const { id } = useParams();

@@ -1,8 +1,31 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getNewArrivals, getTrending, getFeatured } from '../util/catalogApi';
+
+export const fetchBooks = createAsyncThunk(
+  'content/fetchBooks',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { sortBy } = getState().content;
+      const res =
+        sortBy === 'trending' ? await getTrending(20) :
+        sortBy === 'featured' ? await getFeatured() :
+        await getNewArrivals(20);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response ? 'Something went wrong on our end.' : "Can't reach the server — check your network."
+      );
+    }
+  }
+);
 
 const initialState = {
   selectedGenre: 'all',
   searchQuery: '',
+  sortBy: 'recent',
+  books: [],
+  loading: false,
+  error: '',
 };
 
 const contentSlice = createSlice({
@@ -15,8 +38,26 @@ const contentSlice = createSlice({
     setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
     },
+    setSortBy: (state, action) => {
+      state.sortBy = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchBooks.pending, (state) => {
+        state.loading = true;
+        state.error = '';
+      })
+      .addCase(fetchBooks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.books = action.payload;
+      })
+      .addCase(fetchBooks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { setGenre, setSearchQuery } = contentSlice.actions;
+export const { setGenre, setSearchQuery, setSortBy } = contentSlice.actions;
 export default contentSlice.reducer;

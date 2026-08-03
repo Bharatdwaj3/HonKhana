@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Footer } from "../layout/index";
 import { Hero } from "../components/Hero";
 import { ValueProp } from "../components/ValueProp";
-import SimilarBooksRow from "../features/content/SimilarBooksRow";
+import SimilarBooksRow from "../components/SimilarBooksRow";
 import { getTrending, getFeatured, getNewArrivals } from "../util/catalogApi";
 
 export default function Home() {
