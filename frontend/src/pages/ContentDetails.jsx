@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy, FileText } from 'lucide-react';
+import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy, FileText, Bookmark } from 'lucide-react';
 import { getBook, getSimilarBooks } from '../util/catalogApi';
 import { borrowBook as borrowBookRequest } from '../util/circulationApi';
+import { toggleBookmark } from '../store/bookmarkSlice';
 import SimilarBooksRow from '../components/SimilarBooksRow';
 
 const ContentDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const bookmarkedBooks = useSelector((state) => state.bookmark.books);
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [borrowing, setBorrowing] = useState(false);
@@ -16,6 +20,8 @@ const ContentDetails = () => {
   const [error, setError] = useState('');
   const [similarByAuthor, setSimilarByAuthor] = useState([]);
   const [similarByGenre, setSimilarByGenre] = useState([]);
+
+  const isBookmarked = book ? bookmarkedBooks.some((b) => b.id === book.id) : false;
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -51,6 +57,10 @@ const ContentDetails = () => {
     } finally {
       setBorrowing(false);
     }
+  };
+
+  const handleToggleBookmark = () => {
+    dispatch(toggleBookmark({ id: book.id, title: book.title, author: book.author, coverUrl: book.coverUrl }));
   };
 
   if (loading) {
@@ -95,7 +105,12 @@ const ContentDetails = () => {
           </div>
 
           <div className="md:col-span-8 flex flex-col">
-            <h1 className="text-4xl font-black tracking-tight mb-2">{book.title}</h1>
+            <div className="flex items-start justify-between gap-4 mb-2">
+              <h1 className="text-4xl font-black tracking-tight">{book.title}</h1>
+              <button onClick={handleToggleBookmark} aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'} className="shrink-0 p-2 rounded-xl border border-border hover:bg-foreground/5 transition-all">
+                <Bookmark size={22} className={isBookmarked ? 'fill-primary text-primary' : 'text-foreground/60'} />
+              </button>
+            </div>
             <p className="text-xl text-foreground/60 mb-6 font-medium">{book.author}</p>
 
             <div className="grid grid-cols-2 gap-6 mb-8">
