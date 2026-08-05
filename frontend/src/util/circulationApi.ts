@@ -32,3 +32,8 @@ export const returnBook = (id) => circulationApi.put(`/loan/${id}/return`);
 export const getMyLoans = () => circulationApi.get('/loan/mine');
 export const renewBook = (id) => circulationApi.put(`/loan/${id}/renew`);
 export const getAllLoans = () => circulationApi.get('/loan');
+
+// Fine routes
+export const getMyFines = () => circulationApi.get('/fine/mine');
+export const createPayOrder = (fineId) => circulationApi.post(`/fine/${fineId}/pay-order`);
+export const verifyPayment = (data) => circulationApi.post('/fine/verify-payment', data);

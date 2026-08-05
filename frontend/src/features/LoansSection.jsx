@@ -2,6 +2,7 @@ import React from 'react';
 import { BookOpen } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import LoanListItem from '../components/LoanListItem';
+import FinesSection from './FinesSection';
 
 const LoansSection = ({ isAdmin }) => {
   const {
@@ -34,6 +35,8 @@ const LoansSection = ({ isAdmin }) => {
           <span className="text-lg font-black text-red-500">₹{totalFinesOwed}</span>
         </div>
       )}
+
+      {!isAdmin && <FinesSection />}
 
       {loans.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
