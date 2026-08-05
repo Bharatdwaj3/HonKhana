@@ -7,7 +7,13 @@ import type { Response as ExpressResponse } from "express";
 
 const LOAN_PERIOD_DAYS = 14;
 const MAX_RENEWALS = 2;
-const FINE_PER_DAY = 5;
+const FINE_PER_DAY = 50;
+const MAX_UNPAID_FINES = 1000;
+const MAX_ACTIVE_LOANS: Record<string, number> = {
+  student: 3,
+  faculty: 5,
+  admin: 0,
+};
 
 // Adds isOverdue / daysOverdue to a loan without storing them in the DB —
 // always accurate since it's computed against the current time on every read.
@@ -40,9 +46,16 @@ const borrowBook = async (req: AuthRequest, res: ExpressResponse): Promise<void>
   try {
     const { bookId } = req.body;
     const userId = req.user?.id;
+    const userRole = req.user?.role || "";
 
     if (!bookId) {
       res.status(400).json({ message: "bookId is required" });
+      return;
+    }
+
+    const maxActive = MAX_ACTIVE_LOANS[userRole] ?? 0;
+    if (maxActive === 0) {
+      res.status(403).json({ message: "Your role is not permitted to borrow books" });
       return;
     }
 
@@ -53,6 +66,32 @@ const borrowBook = async (req: AuthRequest, res: ExpressResponse): Promise<void>
     }
     if (book.availableCopies < 1) {
       res.status(409).json({ message: "No copies currently available" });
+      return;
+    }
+
+    // Cap check: block if the user already has too many active (unreturned) loans for their role
+    const activeLoanCount = await prisma.loan.count({
+      where: { userId, returnedAt: null },
+    });
+    if (activeLoanCount >= maxActive) {
+      res.status(403).json({ message: `You have reached the maximum of ${maxActive} active loans` });
+      return;
+    }
+
+    // Cap check: block if the user's total unpaid fines are over the threshold.
+    // Unpaid amounts can come from two places — late-return fines already on a loan,
+    // and admin-issued fines in the separate `fine` table.
+    const unpaidLoanFines = await prisma.loan.aggregate({
+      where: { userId, fineAmount: { gt: 0 } },
+      _sum: { fineAmount: true },
+    });
+    const unpaidIssuedFines = await prisma.fine.aggregate({
+      where: { userId, paid: false },
+      _sum: { amount: true },
+    });
+    const totalUnpaid = (unpaidLoanFines._sum.fineAmount || 0) + (unpaidIssuedFines._sum.amount || 0);
+    if (totalUnpaid > MAX_UNPAID_FINES) {
+      res.status(403).json({ message: `You have unpaid fines of ${totalUnpaid} — please clear them before borrowing` });
       return;
     }
 
