@@ -46,3 +46,14 @@ export const extractPdf = (formData) => catalogApi.post('/storage/extract', form
 export const getFileUrl = (fileName) => catalogApi.get(`/storage/file/${fileName}`);
 export const listFiles = () => catalogApi.get('/storage/files');
 export const deleteFile = (fileName) => catalogApi.delete(`/storage/file/${fileName}`);
+
+// Cart routes
+export const getCart = () => catalogApi.get('/cart');
+export const addToCart = (bookId) => catalogApi.post('/cart', { bookId });
+export const removeFromCart = (bookId) => catalogApi.delete(`/cart/${bookId}`);
+export const checkoutCart = () => catalogApi.post('/cart/checkout');
+
+// Wishlist routes
+export const getWishlist = () => catalogApi.get('/wishlist');
+export const addToWishlist = (bookId) => catalogApi.post('/wishlist', { bookId });
+export const removeFromWishlist = (bookId) => catalogApi.delete(`/wishlist/${bookId}`);

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Menu, X, User, LogOut } from 'lucide-react';
+import { Search, Menu, X, User, LogOut, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchUser, clearUser } from '../store/avatarSlice';
+import { fetchCart } from '../store/cartSlice';
 import { logoutUser } from '../util/membersApi';
 
 const getProfile = (user) => user?.faculty || user?.student || null;
@@ -23,6 +24,7 @@ const getInitial = (user) => {
 const Navbar = () => {
   const dispatch = useDispatch();
   const { user, loading } = useSelector(state => state.avatar);
+  const cartItems = useSelector((state) => state.cart.items);
   const navigate = useNavigate();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,6 +33,12 @@ const Navbar = () => {
   useEffect(() => {
     dispatch(fetchUser());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (user && user.role !== 'admin') {
+      dispatch(fetchCart());
+    }
+  }, [user, dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -89,6 +97,21 @@ const Navbar = () => {
               <Search size={20} className="text-foreground/60" />
             </button>
 
+            {user && user.role !== 'admin' && (
+              <Link
+                to="/cart"
+                className="relative p-2 hover:bg-foreground/5 rounded-lg transition-colors"
+                aria-label="Cart"
+              >
+                <ShoppingCart size={20} className="text-foreground/60" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4.5 h-4.5 min-w-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {user ? (
               <div className="relative">
                 <button
@@ -138,6 +161,16 @@ const Navbar = () => {
                             <User size={16} />
                             My Profile
                           </Link>
+                          {user.role !== 'admin' && (
+                            <Link
+                              to="/wishlist"
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/70 hover:bg-foreground/5 hover:text-primary transition-colors"
+                            >
+                              <ShoppingCart size={16} />
+                              My Wishlist
+                            </Link>
+                          )}
                         </div>
 
                         <div className="border-t border-border py-2">

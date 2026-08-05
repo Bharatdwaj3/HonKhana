@@ -10,6 +10,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import {Login, Signup} from "./auth/index";
 import {Navbar} from "./components/index";
 import ContentDetails from "./pages/ContentDetails";
+import Cart from "./pages/Cart";
+import Wishlist from "./pages/Wishlist";
 
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 
@@ -29,6 +31,8 @@ function App() {
 
               <Route path="/content/:id" element={<ContentDetails/>}/>
               <Route path="/explore" element={<Explore />} />
+              <Route path="/cart" element={<ProtectedRoute path="/cart"><Cart/></ProtectedRoute>}/>
+              <Route path="/wishlist" element={<ProtectedRoute path="/wishlist"><Wishlist/></ProtectedRoute>}/>
 
               <Route path="/staff/new" element={<ProtectedRoute path="/staff/new"><NewStory /></ProtectedRoute>} />
               <Route path="/read/:id" element={<ProtectedRoute path="/read/:id"><PdfViewer /></ProtectedRoute>} />

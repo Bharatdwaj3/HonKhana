@@ -1,24 +1,42 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { BookOpen, Tag, Pencil, Trash2 } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { BookOpen, Tag, Pencil, Trash2, ShoppingCart, Heart } from 'lucide-react';
 import { deleteBook } from '../util/catalogApi';
+import { addBookToCart, removeBookFromCart } from '../store/cartSlice';
+import { addBookToWishlist, removeBookFromWishlist } from '../store/wishlistSlice';
 
 const BookCard = ({ book, index = 0, showAdminActions = false, onDeleted }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.avatar);
+  const cartItems = useSelector((state) => state.cart.items);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
   const isAdmin = showAdminActions && user?.role === 'admin';
+
+  const inCart = cartItems.some((item) => item.bookId === book.id);
+  const inWishlist = wishlistItems.some((item) => item.bookId === book.id);
 
   const handleDelete = async (e) => {
     e.stopPropagation();
-    if (!window.confirm('Delete this book permanently?')) return;
+    if (window.confirm('Delete this book permanently?') === false) return;
     try {
       await deleteBook(book.id);
       onDeleted?.(book.id);
     } catch (err) {
       alert('Failed to delete book');
     }
+  };
+
+  const handleToggleCart = (e) => {
+    e.stopPropagation();
+    dispatch(inCart ? removeBookFromCart(book.id) : addBookToCart(book.id));
+  };
+
+  const handleToggleWishlist = (e) => {
+    e.stopPropagation();
+    dispatch(inWishlist ? removeBookFromWishlist(book.id) : addBookToWishlist(book.id));
   };
 
   return (
@@ -56,6 +74,25 @@ const BookCard = ({ book, index = 0, showAdminActions = false, onDeleted }) => {
               className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"
             >
               <Trash2 size={14} />
+            </button>
+          </div>
+        )}
+
+        {isAdmin === false && user && (
+          <div className="absolute top-3 right-3 flex gap-2 z-10">
+            <button
+              onClick={handleToggleWishlist}
+              aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"
+            >
+              <Heart size={14} className={inWishlist ? 'fill-primary text-primary' : ''} />
+            </button>
+            <button
+              onClick={handleToggleCart}
+              aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
+              className="p-2 rounded-full bg-card/90 border border-border text-foreground/60 hover:text-primary transition-all"
+            >
+              <ShoppingCart size={14} className={inCart ? 'fill-primary text-primary' : ''} />
             </button>
           </div>
         )}
