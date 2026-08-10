@@ -70,15 +70,15 @@ const cartSlice = createSlice({
       .addCase(fetchCart.pending, (state) => { state.loading = true; })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(addBookToCart.fulfilled, (state, action) => { state.items = action.payload; })
+      .addCase(addBookToCart.fulfilled, (state, action) => { state.items = Array.isArray(action.payload) ? action.payload : []; })
       .addCase(addBookToCart.rejected, (state, action) => { state.error = action.payload; })
-      .addCase(removeBookFromCart.fulfilled, (state, action) => { state.items = action.payload; })
+      .addCase(removeBookFromCart.fulfilled, (state, action) => { state.items = Array.isArray(action.payload) ? action.payload : []; })
       .addCase(removeBookFromCart.rejected, (state, action) => { state.error = action.payload; })
       .addCase(checkout.pending, (state) => { state.checkingOut = true; })
       .addCase(checkout.fulfilled, (state, action) => {

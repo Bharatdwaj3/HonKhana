@@ -52,15 +52,15 @@ const wishlistSlice = createSlice({
       .addCase(fetchWishlist.pending, (state) => { state.loading = true; })
       .addCase(fetchWishlist.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchWishlist.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(addBookToWishlist.fulfilled, (state, action) => { state.items = action.payload; })
+      .addCase(addBookToWishlist.fulfilled, (state, action) => { state.items = Array.isArray(action.payload) ? action.payload : []; })
       .addCase(addBookToWishlist.rejected, (state, action) => { state.error = action.payload; })
-      .addCase(removeBookFromWishlist.fulfilled, (state, action) => { state.items = action.payload; })
+      .addCase(removeBookFromWishlist.fulfilled, (state, action) => { state.items = Array.isArray(action.payload) ? action.payload : []; })
       .addCase(removeBookFromWishlist.rejected, (state, action) => { state.error = action.payload; });
   },
 });
