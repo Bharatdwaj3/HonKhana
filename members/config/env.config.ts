@@ -14,6 +14,7 @@ export const PgSql_Database = process.env.PgSql_Database as string;
 export const PgSql_Host = process.env.PgSql_Host || 'members-db';
 export const PgSql_Port = process.env.PgSql_Port || '5432';
 const EPword = encodeURIComponent(PgSql_Password);
+export const DEFAULT_USER_PASSWORD = process.env.DEFAULT_USER_PASSWORD || 'Password123!';
 export const DATABASE_URL = `postgresql://${PgSql_User}:${EPword}@${PgSql_Host}:${PgSql_Port}/${PgSql_Database}?schema=public`;
 if (!JWT_ACC_SECRECT) throw new Error('JWT_ACC_SECRECT is missing from .env');
 if (!JWT_REF_SECRECT) throw new Error('JWT_REF_SECRECT is missing from .env');

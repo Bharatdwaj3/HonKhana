@@ -50,7 +50,7 @@ const contentSlice = createSlice({
       })
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.loading = false;
-        state.books = action.payload;
+        state.books = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchBooks.rejected, (state, action) => {
         state.loading = false;

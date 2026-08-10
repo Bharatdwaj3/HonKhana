@@ -28,7 +28,7 @@ export function useFines() {
     setLoading(true);
     try {
       const res = await getMyFines();
-      setFines(res.data);
+      setFines(Array.isArray(res.data) ? res.data : []);
       setError('');
     } catch (err) {
       setError(err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.');

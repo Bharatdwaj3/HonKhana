@@ -14,7 +14,7 @@ export function useLoans(isAdmin) {
     try {
       const res = isAdmin ? await getAllLoans() : await getMyLoans();
       const loansWithBooks = await Promise.all(
-        res.data.map(async (loan) => {
+           (Array.isArray(res.data) ? res.data : []).map(async (loan) => {
           try {
             const bookRes = await getBook(loan.bookId);
             return { ...loan, book: bookRes.data };
