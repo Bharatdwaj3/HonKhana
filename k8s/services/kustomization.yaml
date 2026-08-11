@@ -37,13 +37,13 @@ images:
     newTag: v7
   - name: circulation
     newName: ghcr.io/bharatdwaj3/circulation
-    newTag: v6
+    newTag: v7
   - name: members
     newName: ghcr.io/bharatdwaj3/members
-    newTag: v6
+    newTag: v7
   - name: firebase
     newName: ghcr.io/bharatdwaj3/firebase
     newTag: v3
   - name: ghcr.io/bharatdwaj3/frontend
     newName: ghcr.io/bharatdwaj3/frontend
-    newTag: v31
+    newTag: v32
