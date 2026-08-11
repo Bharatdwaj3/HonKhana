@@ -40,7 +40,7 @@ images:
     newTag: v7
   - name: members
     newName: ghcr.io/bharatdwaj3/members
-    newTag: v7
+    newTag: v6
   - name: firebase
     newName: ghcr.io/bharatdwaj3/firebase
     newTag: v3
