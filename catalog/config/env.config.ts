@@ -25,5 +25,7 @@ export const Fbase_universe_domain = process.env.Fbase_universe_domain || 'googl
 
 if (!JWT_ACC_SECRECT) throw new Error('JWT_ACC_SECRECT is missing from .env');
 if (!INTERNAL_SERVICE_SECRET) throw new Error('INTERNAL_SERVICE_SECRET is missing from .env');
+export const MEMBERS_SERVICE_URL = process.env.MEMBERS_SERVICE_URL as string;
+if (!MEMBERS_SERVICE_URL) throw new Error("MEMBERS_SERVICE_URL is missing from .env");
 export const CIRCULATION_SERVICE_URL = process.env.CIRCULATION_SERVICE_URL as string;
 if (!CIRCULATION_SERVICE_URL) throw new Error('CIRCULATION_SERVICE_URL is missing from .env');

@@ -1,4 +1,5 @@
 import prisma from "../config/prisma-client.ts";
+import { MEMBERS_SERVICE_URL, INTERNAL_SERVICE_SECRET } from "../config/env.config.ts";
 
 const books = [
   { title: "To Kill a Mockingbird", author: "Harper Lee", publisher: "Harper Perennial", isbn: "9780061120084", genre: ["FICTION"] },
@@ -58,29 +59,27 @@ const books = [
 
   { title: "Hamlet", author: "William Shakespeare", publisher: "Simon & Schuster", isbn: "9780743477123", genre: ["DRAMA"] },
   { title: "A Streetcar Named Desire", author: "Tennessee Williams", publisher: "New Directions", isbn: "9780811216029", genre: ["DRAMA"] },
-  { title: "Death of a Salesman", author: "Arthur Miller", publisher: "Penguin Classics", isbn: "9780140481341", genre: ["DRAMA"] },
-  { title: "The Crucible", author: "Arthur Miller", publisher: "Penguin Books", isbn: "9780142437339", genre: ["DRAMA"] },
-
-  { title: "Atomic Habits", author: "James Clear", publisher: "Avery", isbn: "9780735211292", genre: ["SELF_HELP"] },
-  { title: "The 7 Habits of Highly Effective People", author: "Stephen R. Covey", publisher: "Free Press", isbn: "9780743269513", genre: ["SELF_HELP"] },
-  { title: "How to Win Friends and Influence People", author: "Dale Carnegie", publisher: "Pocket Books", isbn: "9780671027032", genre: ["SELF_HELP"] },
-  { title: "Man's Search for Meaning", author: "Viktor E. Frankl", publisher: "Beacon Press", isbn: "9780807014295", genre: ["SELF_HELP"] },
-
-  { title: "Clean Code", author: "Robert C. Martin", publisher: "Prentice Hall", isbn: "9780132350884", genre: ["TECHNOLOGY"] },
-  { title: "The Pragmatic Programmer", author: "David Thomas & Andrew Hunt", publisher: "Addison-Wesley", isbn: "9780135957059", genre: ["TECHNOLOGY"] },
-  { title: "Introduction to Algorithms", author: "Cormen, Leiserson, Rivest, Stein", publisher: "MIT Press", isbn: "9780262046305", genre: ["TECHNOLOGY"] },
-  { title: "The Mythical Man-Month", author: "Frederick P. Brooks Jr.", publisher: "Addison-Wesley", isbn: "9780201835953", genre: ["TECHNOLOGY"] },
-
-  { title: "Meditations", author: "Marcus Aurelius", publisher: "Penguin Classics", isbn: "9780140449334", genre: ["PHILOSOPHY"] },
-  { title: "Thus Spoke Zarathustra", author: "Friedrich Nietzsche", publisher: "Penguin Classics", isbn: "9780140441185", genre: ["PHILOSOPHY"] },
-  { title: "The Republic", author: "Plato", publisher: "Penguin Classics", isbn: "9780140455113", genre: ["PHILOSOPHY"] },
-  { title: "Beyond Good and Evil", author: "Friedrich Nietzsche", publisher: "Penguin Classics", isbn: "9780140449235", genre: ["PHILOSOPHY"] },
-
-  { title: "Charlotte's Web", author: "E.B. White", publisher: "Harper Collins", isbn: "9780064400558", genre: ["CHILDREN"] },
-  { title: "Where the Wild Things Are", author: "Maurice Sendak", publisher: "Harper Collins", isbn: "9780064431781", genre: ["CHILDREN"] },
-  { title: "Matilda", author: "Roald Dahl", publisher: "Puffin Books", isbn: "9780142410370", genre: ["CHILDREN"] },
-  { title: "The Very Hungry Caterpillar", author: "Eric Carle", publisher: "Philomel Books", isbn: "9780399226908", genre: ["CHILDREN"] },
 ];
+
+const userEmails = [
+  "ravi.sharma@library.local",
+  "meera.iyer@library.local",
+  "arjun.verma@library.local",
+  "priya.nair@library.local",
+  "aditya.rao@library.local",
+  "sneha.kulkarni@library.local",
+  "karan.mehta@library.local",
+  "divya.menon@library.local",
+];
+
+async function resolveUserId(email) {
+  const res = await fetch(`${MEMBERS_SERVICE_URL}/api/v1/internal/user/by-email/${email}`, {
+    headers: { "x-internal-secret": INTERNAL_SERVICE_SECRET },
+  });
+  if (!res.ok) throw new Error(`Could not resolve user for ${email} (status ${res.status})`);
+  const data = await res.json();
+  return data.id;
+}
 
 async function main() {
   for (const b of books) {
@@ -101,6 +100,36 @@ async function main() {
     console.log(`Seeded: ${b.title}`);
   }
   console.log(`Done. Seeded ${books.length} books.`);
+
+  console.log("Resolving user IDs from members service...");
+  const userIds = [];
+  for (const email of userEmails) {
+    userIds.push(await resolveUserId(email));
+  }
+
+  const seededBooks = await prisma.book.findMany({ take: 8, orderBy: { id: "asc" } });
+
+  console.log("Seeding cart items...");
+  for (let i = 0; i < userIds.length; i++) {
+    const book = seededBooks[i % seededBooks.length];
+    await prisma.cart_item.upsert({
+      where: { userId_bookId: { userId: userIds[i], bookId: book.id } },
+      update: {},
+      create: { userId: userIds[i], bookId: book.id },
+    });
+  }
+  console.log(`Seeded ${userIds.length} cart items.`);
+
+  console.log("Seeding wishlist items...");
+  for (let i = 0; i < userIds.length; i++) {
+    const book = seededBooks[(i + 3) % seededBooks.length];
+    await prisma.wishlist_item.upsert({
+      where: { userId_bookId: { userId: userIds[i], bookId: book.id } },
+      update: {},
+      create: { userId: userIds[i], bookId: book.id },
+    });
+  }
+  console.log(`Seeded ${userIds.length} wishlist items.`);
 }
 
 main()
