@@ -231,4 +231,45 @@ const renewBook = async (req: AuthRequest, res: ExpressResponse): Promise<void> 
   }
 };
 
-export { borrowBook, returnBook, listMyLoans, listAllLoans, listOverdueLoans, renewBook, attemptBorrow };
+export { borrowBook, returnBook, listMyLoans, listAllLoans, listOverdueLoans, renewBook, attemptBorrow, createLoanFine };
+
+// Creates (or returns the existing) payable `fine` record for an overdue loan's
+// fineAmount, so the existing Razorpay fine-payment flow can handle it. Idempotent —
+// safe to call every time the "Pay Fine" button is clicked.
+const createLoanFine = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const loanId = Number(req.params.id);
+    const userId = req.user?.id;
+
+    const loan = await prisma.loan.findUnique({ where: { id: loanId } });
+    if (!loan) {
+      res.status(404).json({ message: "Loan not found" });
+      return;
+    }
+    if (loan.userId !== userId) {
+      res.status(403).json({ message: "You can only pay fines on your own loans" });
+      return;
+    }
+    if (!loan.fineAmount || loan.fineAmount <= 0) {
+      res.status(400).json({ message: "This loan has no outstanding fine" });
+      return;
+    }
+
+    const fine = await prisma.fine.upsert({
+      where: { loanId: loan.id },
+      update: {},
+      create: {
+        userId: loan.userId,
+        amount: loan.fineAmount,
+        reason: "Late",
+        issuedBy: loan.userId,
+        loanId: loan.id,
+      },
+    });
+
+    res.status(200).json(fine);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to create fine for loan";
+    res.status(500).json({ message });
+  }
+};

@@ -3,7 +3,6 @@ import { BookOpen } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import LoanListItem from '../components/LoanListItem';
 import FinesSection from './FinesSection';
-
 const LoansSection = ({ isAdmin }) => {
   const {
     loans,
@@ -14,8 +13,10 @@ const LoansSection = ({ isAdmin }) => {
     handleReturn,
     isOverdue,
     totalFinesOwed,
+    handlePayFine,
+    payingFineForLoanId,
+    payFineError,
   } = useLoans(isAdmin);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -23,21 +24,18 @@ const LoansSection = ({ isAdmin }) => {
       </div>
     );
   }
-
   return (
     <div>
       {error && <p className="text-sm text-primary mb-6">{error}</p>}
       {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
-
+      {payFineError && <p className="text-sm text-red-500 mb-6">{payFineError}</p>}
       {totalFinesOwed > 0 && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6 flex items-center justify-between">
           <span className="text-sm font-semibold text-red-500">Total Fines Owed</span>
           <span className="text-lg font-black text-red-500">₹{totalFinesOwed}</span>
         </div>
       )}
-
       {!isAdmin && <FinesSection />}
-
       {loans.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
           <BookOpen size={32} className="mx-auto mb-3 text-foreground/20" />
@@ -52,6 +50,8 @@ const LoansSection = ({ isAdmin }) => {
               overdue={isOverdue(loan)}
               returning={returningId === loan.id}
               onReturn={handleReturn}
+              payingFine={payingFineForLoanId === loan.id}
+              onPayFine={handlePayFine}
             />
           ))}
         </div>
@@ -59,5 +59,4 @@ const LoansSection = ({ isAdmin }) => {
     </div>
   );
 };
-
 export default LoansSection;

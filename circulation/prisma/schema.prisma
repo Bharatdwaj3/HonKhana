@@ -30,4 +30,5 @@ model fine {
   issuedBy   Int
   paid       Boolean   @default(false)
   createdAt  DateTime  @default(now())
+  loanId     Int?      @unique
 }

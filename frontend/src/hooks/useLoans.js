@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getMyLoans, getAllLoans, returnBook } from '../util/circulationApi';
+import { getMyLoans, getAllLoans, returnBook, createLoanFine, createPayOrder, verifyPayment } from '../util/circulationApi';
 import { getBook } from '../util/catalogApi';
+import { loadRazorpayScript } from '../util/razorpay';
 
 export function useLoans(isAdmin) {
   const [loans, setLoans] = useState([]);
@@ -8,13 +9,15 @@ export function useLoans(isAdmin) {
   const [returningId, setReturningId] = useState(null);
   const [error, setError] = useState('');
   const [returnError, setReturnError] = useState('');
+  const [payingFineForLoanId, setPayingFineForLoanId] = useState(null);
+  const [payFineError, setPayFineError] = useState('');
 
   const fetchLoans = async () => {
     setLoading(true);
     try {
       const res = isAdmin ? await getAllLoans() : await getMyLoans();
       const loansWithBooks = await Promise.all(
-           (Array.isArray(res.data) ? res.data : []).map(async (loan) => {
+        (Array.isArray(res.data) ? res.data : []).map(async (loan) => {
           try {
             const bookRes = await getBook(loan.bookId);
             return { ...loan, book: bookRes.data };
@@ -49,6 +52,55 @@ export function useLoans(isAdmin) {
     }
   };
 
+  const handlePayFine = async (loan) => {
+    setPayingFineForLoanId(loan.id);
+    setPayFineError('');
+    try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        setPayFineError('Could not load the payment window — check your connection and try again.');
+        setPayingFineForLoanId(null);
+        return;
+      }
+
+      const { data: fine } = await createLoanFine(loan.id);
+      const { data } = await createPayOrder(fine.id);
+
+      const razorpayOptions = {
+        key: data.keyId,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        order_id: data.order.id,
+        name: 'Library Fine Payment',
+        description: `Late fine for ${loan.book?.title ?? 'loan'}`,
+        handler: async (response) => {
+          try {
+            await verifyPayment({
+              fineId: fine.id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            await fetchLoans();
+          } catch (err) {
+            setPayFineError('Payment succeeded but verification failed — please contact support.');
+          } finally {
+            setPayingFineForLoanId(null);
+          }
+        },
+        modal: {
+          ondismiss: () => setPayingFineForLoanId(null),
+        },
+      };
+
+      const razorpayInstance = new window.Razorpay(razorpayOptions);
+      razorpayInstance.open();
+    } catch (err) {
+      setPayFineError(err.response?.data?.message || 'Failed to start payment — please try again.');
+      setPayingFineForLoanId(null);
+    }
+  };
+
   const isOverdue = (loan) => !loan.returnedAt && new Date(loan.dueAt) < new Date();
   const totalFinesOwed = loans.reduce((sum, loan) => sum + (loan.fineAmount || 0), 0);
 
@@ -61,5 +113,8 @@ export function useLoans(isAdmin) {
     handleReturn,
     isOverdue,
     totalFinesOwed,
+    handlePayFine,
+    payingFineForLoanId,
+    payFineError,
   };
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-const LoanListItem = ({ loan, overdue, returning, onReturn }) => {
+const LoanListItem = ({ loan, overdue, returning, onReturn, payingFine, onPayFine }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -35,9 +35,18 @@ const LoanListItem = ({ loan, overdue, returning, onReturn }) => {
           </span>
         ) : null}
         {loan.fineAmount > 0 && (
-          <span className="inline-flex items-center gap-1 text-xs text-red-500 mt-1 font-semibold">
-            Fine: ₹{loan.fineAmount}
-          </span>
+          <div className="flex items-center gap-3 mt-1">
+            <span className="inline-flex items-center gap-1 text-xs text-red-500 font-semibold">
+              Fine: ₹{loan.fineAmount}
+            </span>
+            <button
+              onClick={() => onPayFine(loan)}
+              disabled={payingFine}
+              className="px-2 py-1 bg-red-500 text-white rounded-lg text-xs font-semibold hover:bg-red-500/90 transition-all disabled:opacity-50"
+            >
+              {payingFine ? 'Processing...' : 'Pay Fine'}
+            </button>
+          </div>
         )}
       </div>
 

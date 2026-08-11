@@ -1,21 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getMyFines, createPayOrder, verifyPayment } from '../util/circulationApi';
+import { loadRazorpayScript } from '../util/razorpay';
 
-// Loads the Razorpay checkout script once, the first time it's actually needed —
-// avoids adding a permanent <script> tag to index.html for a feature not every page uses.
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
 
 export function useFines() {
   const [fines, setFines] = useState([]);

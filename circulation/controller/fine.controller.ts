@@ -131,6 +131,13 @@ const verifyPayment = async (req: AuthRequest, res: Response): Promise<void> => 
       data: { paid: true },
     });
 
+    if (updatedFine.loanId) {
+      await prisma.loan.update({
+        where: { id: updatedFine.loanId },
+        data: { fineAmount: 0 },
+      });
+    }
+
     res.status(200).json(updatedFine);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Payment verification failed";
