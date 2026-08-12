@@ -17,6 +17,10 @@ data:
         location /api/v1/storage {
             proxy_pass http://catalog.hon-khana.svc.cluster.local:4001;
         }
+        location /api/v1/fine {
+            proxy_pass http://circulation.hon-khana.svc.cluster.local:4002;
+        }
+
         location /api/v1/loan {
             proxy_pass http://circulation.hon-khana.svc.cluster.local:4002;
         }
