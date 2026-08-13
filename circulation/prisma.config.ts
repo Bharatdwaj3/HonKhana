@@ -11,6 +11,9 @@ const EPword = encodeURIComponent(PgSql_Password);
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
+  migrations: {
+    seed: 'node --loader ts-node/esm prisma/seed.ts',
+  },
   datasource: {
     url: `postgresql://${PgSql_User}:${EPword}@${PgSql_Host}:${PgSql_Port}/${PgSql_Database}?schema=public`,
   },
