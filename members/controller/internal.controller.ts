@@ -38,3 +38,47 @@ export const getUserByEmail = async (req: Request<{ email: string }>, res: Respo
     res.status(500).json({ message });
   }
 };
+
+// Internal-only: bulk lookup for a list of userIds, returning just enough for
+// grouping/display (role + name from whichever profile table applies) —
+// used by circulation to label loans with the borrower's role and name.
+export const getUsersByIds = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idsParam = req.query.ids as string | undefined;
+    if (!idsParam) {
+      res.status(400).json({ message: 'ids query param is required' });
+      return;
+    }
+    const ids = idsParam
+      .split(',')
+      .map((id) => Number(id))
+      .filter((id) => !Number.isNaN(id));
+
+    const users = await prisma.user.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        faculty: { select: { Fname: true, Lname: true } },
+        student: { select: { Fname: true, Lname: true } },
+      },
+    });
+
+    const result = users.map((u) => {
+      const profile = u.faculty || u.student;
+      return {
+        id: u.id,
+        email: u.email,
+        role: u.role,
+        Fname: profile?.Fname ?? null,
+        Lname: profile?.Lname ?? null,
+      };
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch users by ids';
+    res.status(500).json({ message });
+  }
+};

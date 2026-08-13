@@ -1,6 +1,6 @@
 import prisma from "../config/prisma-client.ts";
 import type { AuthRequest } from "../middleware/auth.middleware.ts";
-import { CATALOG_SERVICE_URL, INTERNAL_SERVICE_SECRET } from "../config/env.config.ts";
+import { CATALOG_SERVICE_URL, MEMBERS_SERVICE_URL, INTERNAL_SERVICE_SECRET } from "../config/env.config.ts";
 import type { Request, Response } from "express";
 import type { Response as ExpressResponse } from "express";
 
@@ -165,10 +165,32 @@ const listMyLoans = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 };
 
+// Enriches loans with { role, Fname, Lname } from members, via one bulk call
+// per request instead of one lookup per loan. Fails open — if members is
+// briefly unreachable, loans still return, just without the extra info.
+const attachUserInfo = async (loans: any[]) => {
+  const uniqueUserIds = [...new Set(loans.map((loan) => loan.userId))];
+  if (uniqueUserIds.length === 0) return loans;
+  try {
+    const response = await fetch(
+      `${MEMBERS_SERVICE_URL}/api/v1/internal/users/by-ids?ids=${uniqueUserIds.join(",")}`,
+      { headers: { "x-internal-secret": INTERNAL_SERVICE_SECRET } }
+    );
+    if (!response.ok) return loans;
+    const users = await response.json();
+    const userMap = new Map(users.map((u: any) => [u.id, u]));
+    return loans.map((loan) => ({ ...loan, user: userMap.get(loan.userId) ?? null }));
+  } catch {
+    return loans;
+  }
+};
+
 const listAllLoans = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const loans = await prisma.loan.findMany({ orderBy: { borrowedAt: "desc" } });
-    res.status(200).json(loans.map(withOverdueInfo));
+    const loansWithInfo = loans.map(withOverdueInfo);
+    const enrichedLoans = await attachUserInfo(loansWithInfo);
+    res.status(200).json(enrichedLoans);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch loans";
     res.status(500).json({ message });

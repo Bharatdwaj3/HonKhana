@@ -3,6 +3,48 @@ import { BookOpen } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import LoanListItem from '../components/LoanListItem';
 import FinesSection from './FinesSection';
+
+// Groups admin's "all loans" list into Faculty / Student, then by individual
+// user, so admin can scan pending returns per person instead of one long list.
+// Loans whose user info couldn't be resolved (members briefly unreachable)
+// fall back into "Other" rather than disappearing.
+const groupLoansByRoleAndUser = (loans) => {
+  const faculty = new Map();
+  const student = new Map();
+  const other = [];
+
+  for (const loan of loans) {
+    const role = loan.user?.role;
+    const bucket = role === 'faculty' ? faculty : role === 'student' ? student : null;
+    if (!bucket) {
+      other.push(loan);
+      continue;
+    }
+    const name = loan.user?.Fname ? `${loan.user.Fname} ${loan.user.Lname}` : loan.user?.email ?? `User #${loan.userId}`;
+    if (!bucket.has(loan.userId)) bucket.set(loan.userId, { name, loans: [] });
+    bucket.get(loan.userId).loans.push(loan);
+  }
+
+  return { faculty: [...faculty.values()], student: [...student.values()], other };
+};
+
+const LoanGroup = ({ title, groups, renderLoan }) => {
+  if (groups.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-lg font-bold mb-3">{title}</h3>
+      <div className="space-y-6">
+        {groups.map((group) => (
+          <div key={group.name}>
+            <p className="text-sm font-semibold text-foreground/70 mb-2">{group.name}</p>
+            <div className="space-y-4">{group.loans.map(renderLoan)}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const LoansSection = ({ isAdmin }) => {
   const {
     loans,
@@ -17,6 +59,7 @@ const LoansSection = ({ isAdmin }) => {
     payingFineForLoanId,
     payFineError,
   } = useLoans(isAdmin);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -24,6 +67,22 @@ const LoansSection = ({ isAdmin }) => {
       </div>
     );
   }
+
+  const renderLoanItem = (loan) => (
+    <LoanListItem
+      key={loan.id}
+      loan={loan}
+      overdue={isOverdue(loan)}
+      returning={returningId === loan.id}
+      onReturn={handleReturn}
+      payingFine={payingFineForLoanId === loan.id}
+      onPayFine={handlePayFine}
+      isAdmin={isAdmin}
+    />
+  );
+
+  const grouped = isAdmin ? groupLoansByRoleAndUser(loans) : null;
+
   return (
     <div>
       {error && <p className="text-sm text-primary mb-6">{error}</p>}
@@ -41,20 +100,19 @@ const LoansSection = ({ isAdmin }) => {
           <BookOpen size={32} className="mx-auto mb-3 text-foreground/20" />
           No loans yet.
         </div>
-      ) : (
-        <div className="space-y-4">
-          {loans.map((loan) => (
-            <LoanListItem
-              key={loan.id}
-              loan={loan}
-              overdue={isOverdue(loan)}
-              returning={returningId === loan.id}
-              onReturn={handleReturn}
-              payingFine={payingFineForLoanId === loan.id}
-              onPayFine={handlePayFine}
-            />
-          ))}
+      ) : isAdmin ? (
+        <div className="space-y-8">
+          <LoanGroup title="Faculty" groups={grouped.faculty} renderLoan={renderLoanItem} />
+          <LoanGroup title="Students" groups={grouped.student} renderLoan={renderLoanItem} />
+          {grouped.other.length > 0 && (
+            <div>
+              <h3 className="text-lg font-bold mb-3">Other</h3>
+              <div className="space-y-4">{grouped.other.map(renderLoanItem)}</div>
+            </div>
+          )}
         </div>
+      ) : (
+        <div className="space-y-4">{loans.map(renderLoanItem)}</div>
       )}
     </div>
   );

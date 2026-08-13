@@ -34,7 +34,7 @@ router.put('/profile/:id',
 
 router.delete('/:id',
     authUser,
-    requireRole(['admin', 'faculty']),
+    requireRole(['admin']),
     removeFaculty);
 
 export default router;

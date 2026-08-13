@@ -24,7 +24,7 @@ router.get('/profile/:id',
 
 router.post('/',
     authUser,
-    requireRole(['faculty', 'admin']),
+    requireRole(['admin']),
     registerStudent);
 
 router.put('/profile/:id',
