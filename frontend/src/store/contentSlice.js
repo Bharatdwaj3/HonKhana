@@ -1,15 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getNewArrivals, getTrending, getFeatured } from '../util/catalogApi';
+import { getNewArrivals, getTrending, getFeatured, getBooks } from '../util/catalogApi';
 
 export const fetchBooks = createAsyncThunk(
   'content/fetchBooks',
   async (_, { getState, rejectWithValue }) => {
     try {
-      const { sortBy } = getState().content;
-      const res =
-        sortBy === 'trending' ? await getTrending(20) :
-        sortBy === 'featured' ? await getFeatured() :
-        await getNewArrivals(20);
+      const { sortBy, selectedGenre, searchQuery } = getState().content;
+      const isFiltering = selectedGenre !== 'all' || (searchQuery || '').trim() !== '';
+      const res = isFiltering
+        ? await getBooks()
+        : sortBy === 'trending' ? await getTrending(20)
+        : sortBy === 'featured' ? await getFeatured()
+        : await getNewArrivals(20);
       return res.data;
     } catch (err) {
       return rejectWithValue(
