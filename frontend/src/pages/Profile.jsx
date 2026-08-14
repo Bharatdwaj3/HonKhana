@@ -129,10 +129,10 @@ export default function Profile() {
             </div>
             <DirectorySection
               activeTab={directoryTab}
-              canManageFaculty={isAdmin || user.role === 'faculty'}
+              canManageFaculty={isAdmin}
               canManageStudent={isAdmin}
               canAddFaculty={isAdmin}
-              canAddStudent={isAdmin || user.role === 'faculty'}
+              canAddStudent={isAdmin}
               showRoleChange={isAdmin}
               currentUserId={user.id}
             />
