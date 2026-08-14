@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ChevronDown } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import LoanListItem from '../components/LoanListItem';
 import FinesSection from './FinesSection';
@@ -37,50 +37,48 @@ const splitLoansByStatus = (loans) => ({
   returned: loans.filter((loan) => loan.returnedAt),
 });
 
-const LoanStatusGrid = ({ title, loans, renderLoan }) => {
-  if (loans.length === 0) return null;
-  return (
-    <div className="mb-4">
-      <p className="text-xs font-semibold text-foreground/50 uppercase mb-2">{title}</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {loans.map(renderLoan)}
-      </div>
-    </div>
-  );
+const STATUS_LABELS = { fine: 'Fine', borrow: 'Borrow', returned: 'Returned' };
+const STATUS_BADGE_STYLES = {
+  fine: 'bg-red-500/10 text-red-500 border-red-500/20',
+  borrow: 'bg-foreground/5 text-foreground/70 border-border',
+  returned: 'bg-green-500/10 text-green-600 border-green-500/20',
 };
 
-// One person's card: collapsed by default, showing just their name and a
-// quick status count. Click to expand and reveal the Fine/Borrow/Returned
-// grids for that person, same layout as before but hidden until asked for.
+// One person's card: name + three clickable status badges (Fine/Borrow/Returned).
+// Clicking a badge toggles that category open below the badges, showing
+// just that person's loans in that status as a stacked list.
 const PersonLoanCard = ({ name, loans, renderLoan }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { fine, borrow, returned } = splitLoansByStatus(loans);
+  const [activeStatus, setActiveStatus] = useState(null);
+  const buckets = splitLoansByStatus(loans);
+
+  const toggleStatus = (status) => {
+    setActiveStatus((current) => (current === status ? null : status));
+  };
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
-      <div
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="p-4 flex items-center justify-between cursor-pointer"
-      >
-        <div>
-          <p className="font-bold">{name}</p>
-          <p className="text-sm text-foreground/60">
-            {fine.length} Fine · {borrow.length} Borrow · {returned.length} Returned
-          </p>
-        </div>
-        <ChevronDown
-          size={18}
-          className={`text-foreground/40 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
-        />
+    <div className="bg-card rounded-2xl border border-border p-4">
+      <p className="font-bold mb-3">{name}</p>
+      <div className="flex gap-2 flex-wrap">
+        {Object.keys(STATUS_LABELS).map((status) => (
+          <button
+            key={status}
+            onClick={() => toggleStatus(status)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${STATUS_BADGE_STYLES[status]} ${
+              activeStatus === status ? 'ring-2 ring-offset-1 ring-primary' : ''
+            }`}
+          >
+            {STATUS_LABELS[status]} · {buckets[status].length}
+          </button>
+        ))}
       </div>
 
-      {isExpanded && (
-        <div className="px-4 pb-4 pt-0 border-t border-border mt-2">
-          <div className="pt-4">
-            <LoanStatusGrid title="Fine" loans={fine} renderLoan={renderLoan} />
-            <LoanStatusGrid title="Borrow" loans={borrow} renderLoan={renderLoan} />
-            <LoanStatusGrid title="Returned" loans={returned} renderLoan={renderLoan} />
-          </div>
+      {activeStatus && (
+        <div className="mt-4 pt-4 border-t border-border space-y-3">
+          {buckets[activeStatus].length === 0 ? (
+            <p className="text-sm text-foreground/50">No loans in this category.</p>
+          ) : (
+            buckets[activeStatus].map(renderLoan)
+          )}
         </div>
       )}
     </div>
@@ -92,7 +90,7 @@ const LoanGroup = ({ title, groups, renderLoan }) => {
   return (
     <div>
       <h3 className="text-lg font-bold mb-3">{title}</h3>
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {groups.map((group) => (
           <PersonLoanCard key={group.name} name={group.name} loans={group.loans} renderLoan={renderLoan} />
         ))}
