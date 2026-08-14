@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Mail, Calendar, BookOpen, GraduationCap, Users, Library } from 'lucide-react';
+import { Mail, Calendar, BookOpen, GraduationCap, Library } from 'lucide-react';
 import { fetchUser } from '../store/avatarSlice';
-import DirectorySection from '../features/DirectorySection';
 import LoansSection from '../features/LoansSection';
 import BooksSection from '../features/BooksSection';
 
@@ -17,7 +16,6 @@ export default function Profile() {
   const dispatch = useDispatch();
   const { user, loading } = useSelector((state) => state.avatar);
   const [section, setSection] = useState('loans');
-  const [directoryTab, setDirectoryTab] = useState('faculty');
 
   useEffect(() => {
     if (!user) dispatch(fetchUser());
@@ -34,7 +32,6 @@ export default function Profile() {
   const profile = getProfile(user);
   const isFaculty = Boolean(user.faculty);
   const isAdmin = user.role === 'admin';
-  const canSeeDirectory = user.role === 'admin' || user.role === 'faculty';
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
@@ -83,16 +80,6 @@ export default function Profile() {
           >
             <BookOpen size={16} /> {isAdmin ? 'System Loans' : 'My Loans'}
           </button>
-          {canSeeDirectory && (
-            <button
-              onClick={() => setSection('directory')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                section === 'directory' ? 'bg-primary text-white border border-primary' : 'bg-card border border-border text-foreground/60 hover:border-primary'
-              }`}
-            >
-              <Users size={16} /> Directory
-            </button>
-          )}
           {isAdmin && (
             <button
               onClick={() => setSection('books')}
@@ -106,38 +93,6 @@ export default function Profile() {
         </div>
 
         {section === 'loans' && <LoansSection isAdmin={isAdmin} />}
-
-        {section === 'directory' && canSeeDirectory && (
-          <div>
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={() => setDirectoryTab('faculty')}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  directoryTab === 'faculty' ? 'bg-foreground/10 text-foreground' : 'text-foreground/50 hover:text-foreground'
-                }`}
-              >
-                Faculty
-              </button>
-              <button
-                onClick={() => setDirectoryTab('student')}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  directoryTab === 'student' ? 'bg-foreground/10 text-foreground' : 'text-foreground/50 hover:text-foreground'
-                }`}
-              >
-                Student
-              </button>
-            </div>
-            <DirectorySection
-              activeTab={directoryTab}
-              canManageFaculty={isAdmin}
-              canManageStudent={isAdmin}
-              canAddFaculty={isAdmin}
-              canAddStudent={isAdmin}
-              showRoleChange={isAdmin}
-              currentUserId={user.id}
-            />
-          </div>
-        )}
 
         {section === 'books' && isAdmin && <BooksSection />}
       </div>
