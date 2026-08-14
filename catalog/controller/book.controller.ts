@@ -201,6 +201,27 @@ const bulkSetFeatured = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const bulkSetWeeklyRead = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { ids, weeklyRead } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ message: "ids must be a non-empty array" });
+      return;
+    }
+    if (typeof weeklyRead !== "boolean") {
+      res.status(400).json({ message: "weeklyRead must be a boolean" });
+      return;
+    }
+    const result = await prisma.book.updateMany({
+      where: { id: { in: ids.map(Number) } },
+      data: { weeklyRead },
+    });
+    res.status(200).json({ updated: result.count });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to update weekly read status";
+    res.status(500).json({ message });
+  }
+};
 const getFeatured = async (req: Request, res: Response): Promise<void> => {
   try {
     const books = await prisma.book.findMany({
@@ -213,4 +234,4 @@ const getFeatured = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { listBooks, getBook, registerBook, updateBook, removeBook, adjustCopies, getNewArrivals, getSimilarBooks, getTrending, bulkSetFeatured, getFeatured };
+export { listBooks, getBook, registerBook, updateBook, removeBook, adjustCopies, getNewArrivals, getSimilarBooks, getTrending, bulkSetFeatured, bulkSetWeeklyRead, getFeatured };

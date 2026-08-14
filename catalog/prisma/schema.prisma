@@ -47,6 +47,7 @@ model book {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   featured        Boolean   @default(false)
+  weeklyRead      Boolean   @default(false)
   deletedAt       DateTime?
   cartItems       cart_item[]
   wishlistItems   wishlist_item[]

@@ -39,6 +39,7 @@ export const getSimilarBooks = (id) => catalogApi.get(`/book/${id}/similar`);
 export const getTrending = (limit = 10, days = 7) => catalogApi.get(`/book/trending?limit=${limit}&days=${days}`);
 export const getFeatured = () => catalogApi.get('/book/featured');
 export const setBulkFeatured = (data) => catalogApi.patch('/book/bulk-featured', data);
+export const setBulkWeeklyRead = (data) => catalogApi.patch('/book/bulk-weekly-read', data);
 
 // Storage routes
 export const uploadFile = (formData) => catalogApi.post('/storage/upload', formData, { timeout: 300000 });

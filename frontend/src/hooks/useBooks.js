@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getBooks, setBulkFeatured } from '../util/catalogApi';
+import { getBooks, setBulkFeatured, setBulkWeeklyRead } from '../util/catalogApi';
 
 export function useBooks() {
   const [bookList, setBookList] = useState([]);
@@ -49,6 +49,43 @@ export function useBooks() {
     }
   };
 
+  const handleBulkWeeklyRead = async (weeklyRead) => {
+    if (selectedBookIds.size === 0) return;
+    setBulkSaving(true);
+    setError('');
+    try {
+      await setBulkWeeklyRead({ ids: Array.from(selectedBookIds), weeklyRead });
+      await fetchBooks();
+      setSelectedBookIds(new Set());
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update weekly read status');
+    } finally {
+      setBulkSaving(false);
+    }
+  };
+
+  // Single-book toggles reuse the bulk endpoints with a one-item array —
+  // no separate single-book endpoint needed.
+  const toggleFeatured = async (book) => {
+    setError('');
+    try {
+      await setBulkFeatured({ ids: [book.id], featured: !book.featured });
+      await fetchBooks();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update featured status');
+    }
+  };
+
+  const toggleWeeklyRead = async (book) => {
+    setError('');
+    try {
+      await setBulkWeeklyRead({ ids: [book.id], weeklyRead: !book.weeklyRead });
+      await fetchBooks();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update weekly read status');
+    }
+  };
+
   return {
     bookList,
     loading,
@@ -57,5 +94,8 @@ export function useBooks() {
     bulkSaving,
     toggleBookSelection,
     handleBulkFeatured,
+    handleBulkWeeklyRead,
+    toggleFeatured,
+    toggleWeeklyRead,
   };
 }
