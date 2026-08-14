@@ -28,18 +28,44 @@ const groupLoansByRoleAndUser = (loans) => {
   return { faculty: [...faculty.values()], student: [...student.values()], other };
 };
 
+// Splits one person's loans into the three status grids.
+// A loan can appear in more than one grid (e.g. an overdue loan with a
+// fine shows in both Fine and Borrow) since these aren't mutually exclusive.
+const splitLoansByStatus = (loans) => ({
+  fine: loans.filter((loan) => (loan.fineAmount || 0) > 0),
+  borrow: loans.filter((loan) => !loan.returnedAt),
+  returned: loans.filter((loan) => loan.returnedAt),
+});
+
+const LoanStatusGrid = ({ title, loans, renderLoan }) => {
+  if (loans.length === 0) return null;
+  return (
+    <div className="mb-4">
+      <p className="text-xs font-semibold text-foreground/50 uppercase mb-2">{title}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {loans.map(renderLoan)}
+      </div>
+    </div>
+  );
+};
+
 const LoanGroup = ({ title, groups, renderLoan }) => {
   if (groups.length === 0) return null;
   return (
     <div>
       <h3 className="text-lg font-bold mb-3">{title}</h3>
       <div className="space-y-6">
-        {groups.map((group) => (
-          <div key={group.name}>
-            <p className="text-sm font-semibold text-foreground/70 mb-2">{group.name}</p>
-            <div className="space-y-4">{group.loans.map(renderLoan)}</div>
-          </div>
-        ))}
+        {groups.map((group) => {
+          const { fine, borrow, returned } = splitLoansByStatus(group.loans);
+          return (
+            <div key={group.name}>
+              <p className="text-sm font-semibold text-foreground/70 mb-2">{group.name}</p>
+              <LoanStatusGrid title="Fine" loans={fine} renderLoan={renderLoan} />
+              <LoanStatusGrid title="Borrow" loans={borrow} renderLoan={renderLoan} />
+              <LoanStatusGrid title="Returned" loans={returned} renderLoan={renderLoan} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
