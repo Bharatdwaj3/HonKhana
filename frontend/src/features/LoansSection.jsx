@@ -73,7 +73,7 @@ const PersonLoanCard = ({ name, loans, renderLoan }) => {
       </div>
 
       {activeStatus && (
-        <div className="mt-4 pt-4 border-t border-border space-y-3">
+        <div className="mt-4 pt-4 border-t border-border space-y-3 max-h-64 overflow-y-auto pr-1">
           {buckets[activeStatus].length === 0 ? (
             <p className="text-sm text-foreground/50">No loans in this category.</p>
           ) : (
