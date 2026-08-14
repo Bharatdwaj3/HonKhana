@@ -1,5 +1,5 @@
-import React from 'react';
-import { BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, ChevronDown } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import LoanListItem from '../components/LoanListItem';
 import FinesSection from './FinesSection';
@@ -28,9 +28,9 @@ const groupLoansByRoleAndUser = (loans) => {
   return { faculty: [...faculty.values()], student: [...student.values()], other };
 };
 
-// Splits one person's loans into the three status grids.
-// A loan can appear in more than one grid (e.g. an overdue loan with a
-// fine shows in both Fine and Borrow) since these aren't mutually exclusive.
+// Splits one person's loans into the three status buckets.
+// A loan can appear in more than one bucket (e.g. an overdue loan with a
+// fine counts under both Fine and Borrow) since these aren't mutually exclusive.
 const splitLoansByStatus = (loans) => ({
   fine: loans.filter((loan) => (loan.fineAmount || 0) > 0),
   borrow: loans.filter((loan) => !loan.returnedAt),
@@ -49,23 +49,53 @@ const LoanStatusGrid = ({ title, loans, renderLoan }) => {
   );
 };
 
+// One person's card: collapsed by default, showing just their name and a
+// quick status count. Click to expand and reveal the Fine/Borrow/Returned
+// grids for that person, same layout as before but hidden until asked for.
+const PersonLoanCard = ({ name, loans, renderLoan }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { fine, borrow, returned } = splitLoansByStatus(loans);
+
+  return (
+    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+      <div
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="p-4 flex items-center justify-between cursor-pointer"
+      >
+        <div>
+          <p className="font-bold">{name}</p>
+          <p className="text-sm text-foreground/60">
+            {fine.length} Fine · {borrow.length} Borrow · {returned.length} Returned
+          </p>
+        </div>
+        <ChevronDown
+          size={18}
+          className={`text-foreground/40 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+        />
+      </div>
+
+      {isExpanded && (
+        <div className="px-4 pb-4 pt-0 border-t border-border mt-2">
+          <div className="pt-4">
+            <LoanStatusGrid title="Fine" loans={fine} renderLoan={renderLoan} />
+            <LoanStatusGrid title="Borrow" loans={borrow} renderLoan={renderLoan} />
+            <LoanStatusGrid title="Returned" loans={returned} renderLoan={renderLoan} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LoanGroup = ({ title, groups, renderLoan }) => {
   if (groups.length === 0) return null;
   return (
     <div>
       <h3 className="text-lg font-bold mb-3">{title}</h3>
-      <div className="space-y-6">
-        {groups.map((group) => {
-          const { fine, borrow, returned } = splitLoansByStatus(group.loans);
-          return (
-            <div key={group.name}>
-              <p className="text-sm font-semibold text-foreground/70 mb-2">{group.name}</p>
-              <LoanStatusGrid title="Fine" loans={fine} renderLoan={renderLoan} />
-              <LoanStatusGrid title="Borrow" loans={borrow} renderLoan={renderLoan} />
-              <LoanStatusGrid title="Returned" loans={returned} renderLoan={renderLoan} />
-            </div>
-          );
-        })}
+      <div className="space-y-3">
+        {groups.map((group) => (
+          <PersonLoanCard key={group.name} name={group.name} loans={group.loans} renderLoan={renderLoan} />
+        ))}
       </div>
     </div>
   );
