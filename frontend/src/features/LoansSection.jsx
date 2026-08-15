@@ -402,10 +402,9 @@ const LoansSection = ({ isAdmin }) => {
         {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
         {payFineError && <p className="text-sm text-red-500 mb-6">{payFineError}</p>}
         <FinesSection />
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <StatCard label="Active Loans" value={loans.filter((loan) => !loan.returnedAt).length} />
           <StatCard label="Overdue" value={loans.filter(isOverdue).length} danger={loans.filter(isOverdue).length > 0} />
-          <StatCard label="Unpaid Fines" value={`₹${totalFinesOwed}`} danger={totalFinesOwed > 0} />
         </div>
         <MyLoansTable loans={loans} isOverdue={isOverdue} onReturn={handleReturn} returningId={returningId} />
       </div>
