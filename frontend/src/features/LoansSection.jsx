@@ -18,18 +18,6 @@ const splitLoansByStatus = (loans) => ({
   returned: loans.filter((loan) => loan.returnedAt),
 });
 
-// Small reusable section for the student/faculty view — a title plus a
-// stacked list of loans, or nothing if that category is empty.
-const LabeledLoanList = ({ title, loans, renderLoan }) => {
-  if (loans.length === 0) return null;
-  return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-foreground/50 uppercase mb-3">{title}</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{loans.map(renderLoan)}</div>
-    </div>
-  );
-};
-
 const buildMemberRows = (facultyList, studentList, loans, isOverdue) => {
   const withRole = [
     ...facultyList.map((p) => ({ ...p, role: 'faculty' })),
@@ -254,6 +242,97 @@ const UnresolvedLoansTable = ({ loans, isOverdue, onReturn, returningId, onWaive
   );
 };
 
+// Same Active/History table pattern as UnresolvedLoansTable, but for the
+// signed-in user's own loans — no Waive Fine action here, since waiving is
+// an admin-only action on someone else's fine, not your own.
+const MyLoansTable = ({ loans, isOverdue, onReturn, returningId }) => {
+  const [tab, setTab] = useState('active');
+  const activeLoans = loans.filter((loan) => !loan.returnedAt);
+  const historyLoans = loans.filter((loan) => loan.returnedAt);
+  const visibleLoans = tab === 'active' ? activeLoans : historyLoans;
+  return (
+    <div>
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => setTab('active')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            tab === 'active' ? 'bg-foreground/10 text-foreground' : 'text-foreground/50 hover:text-foreground'
+          }`}
+        >
+          Active ({activeLoans.length})
+        </button>
+        <button
+          onClick={() => setTab('history')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            tab === 'history' ? 'bg-foreground/10 text-foreground' : 'text-foreground/50 hover:text-foreground'
+          }`}
+        >
+          History ({historyLoans.length})
+        </button>
+      </div>
+      {visibleLoans.length === 0 ? (
+        <div className="bg-card rounded-2xl border border-border p-8 text-center text-foreground/50 text-sm">
+          No {tab === 'active' ? 'active' : 'returned'} loans.
+        </div>
+      ) : (
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-foreground/50 text-xs uppercase">
+                <th className="p-4 font-semibold">Book</th>
+                <th className="p-4 font-semibold">Due Date</th>
+                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Fine</th>
+                <th className="p-4 font-semibold"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleLoans.map((loan) => {
+                const overdue = isOverdue(loan);
+                return (
+                  <tr key={loan.id} className="border-b border-border last:border-0 hover:bg-foreground/5">
+                    <td className="p-4 font-semibold">{loan.book?.title ?? `Book #${loan.bookId}`}</td>
+                    <td className="p-4 text-foreground/60">{new Date(loan.dueAt).toLocaleDateString()}</td>
+                    <td className="p-4">
+                      {loan.returnedAt ? (
+                        <span className="text-green-600">Returned</span>
+                      ) : overdue ? (
+                        <span className="text-red-500">Overdue</span>
+                      ) : (
+                        <span className="text-foreground/60">Borrowed</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {loan.fineAmount > 0 ? (
+                        <span className="text-red-500 font-semibold">₹{loan.fineAmount}</span>
+                      ) : (
+                        <span className="text-foreground/40">—</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {!loan.returnedAt && (
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => onReturn(loan.id)}
+                            disabled={returningId === loan.id}
+                            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary text-white hover:bg-primary/90 transition-all disabled:opacity-50"
+                          >
+                            {returningId === loan.id ? 'Returning...' : 'Return'}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LoansSection = ({ isAdmin }) => {
   const {
     loans,
@@ -328,23 +407,7 @@ const LoansSection = ({ isAdmin }) => {
           <StatCard label="Overdue" value={loans.filter(isOverdue).length} danger={loans.filter(isOverdue).length > 0} />
           <StatCard label="Unpaid Fines" value={`₹${totalFinesOwed}`} danger={totalFinesOwed > 0} />
         </div>
-        {loans.length === 0 ? (
-          <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
-            <BookOpen size={32} className="mx-auto mb-3 text-foreground/20" />
-            No loans yet.
-          </div>
-        ) : (
-          (() => {
-            const { fine, borrow, returned } = splitLoansByStatus(loans);
-            return (
-              <div>
-                <LabeledLoanList title="Fines" loans={fine} renderLoan={renderLoanItem} />
-                <LabeledLoanList title="Currently Borrowed" loans={borrow} renderLoan={renderLoanItem} />
-                <LabeledLoanList title="Returned" loans={returned} renderLoan={renderLoanItem} />
-              </div>
-            );
-          })()
-        )}
+        <MyLoansTable loans={loans} isOverdue={isOverdue} onReturn={handleReturn} returningId={returningId} />
       </div>
     );
   }
