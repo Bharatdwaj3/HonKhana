@@ -25,7 +25,7 @@ const LabeledLoanList = ({ title, loans, renderLoan }) => {
   return (
     <div className="mb-6">
       <h3 className="text-sm font-semibold text-foreground/50 uppercase mb-3">{title}</h3>
-      <div className="space-y-4">{loans.map(renderLoan)}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{loans.map(renderLoan)}</div>
     </div>
   );
 };
@@ -323,6 +323,11 @@ const LoansSection = ({ isAdmin }) => {
         {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
         {payFineError && <p className="text-sm text-red-500 mb-6">{payFineError}</p>}
         <FinesSection />
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <StatCard label="Active Loans" value={loans.filter((loan) => !loan.returnedAt).length} />
+          <StatCard label="Overdue" value={loans.filter(isOverdue).length} danger={loans.filter(isOverdue).length > 0} />
+          <StatCard label="Unpaid Fines" value={`₹${totalFinesOwed}`} danger={totalFinesOwed > 0} />
+        </div>
         {loans.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
             <BookOpen size={32} className="mx-auto mb-3 text-foreground/20" />

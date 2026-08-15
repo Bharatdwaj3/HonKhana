@@ -26,12 +26,7 @@ const FinesSection = () => {
         </div>
       )}
 
-      {fines.length === 0 ? (
-        <div className="bg-card rounded-2xl border border-border p-12 text-center text-foreground/60">
-          <CheckCircle2 size={32} className="mx-auto mb-3 text-foreground/20" />
-          No fines — you're all clear.
-        </div>
-      ) : (
+      {fines.length > 0 && (
         <div className="space-y-4">
           {fines.map((fine) => (
             <FineListItem
