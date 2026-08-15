@@ -18,6 +18,18 @@ const splitLoansByStatus = (loans) => ({
   returned: loans.filter((loan) => loan.returnedAt),
 });
 
+// Small reusable section for the student/faculty view — a title plus a
+// stacked list of loans, or nothing if that category is empty.
+const LabeledLoanList = ({ title, loans, renderLoan }) => {
+  if (loans.length === 0) return null;
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-foreground/50 uppercase mb-3">{title}</h3>
+      <div className="space-y-4">{loans.map(renderLoan)}</div>
+    </div>
+  );
+};
+
 const buildMemberRows = (facultyList, studentList, loans, isOverdue) => {
   const withRole = [
     ...facultyList.map((p) => ({ ...p, role: 'faculty' })),
@@ -317,7 +329,16 @@ const LoansSection = ({ isAdmin }) => {
             No loans yet.
           </div>
         ) : (
-          <div className="space-y-4">{loans.map(renderLoanItem)}</div>
+          (() => {
+            const { fine, borrow, returned } = splitLoansByStatus(loans);
+            return (
+              <div>
+                <LabeledLoanList title="Fines" loans={fine} renderLoan={renderLoanItem} />
+                <LabeledLoanList title="Currently Borrowed" loans={borrow} renderLoan={renderLoanItem} />
+                <LabeledLoanList title="Returned" loans={returned} renderLoan={renderLoanItem} />
+              </div>
+            );
+          })()
         )}
       </div>
     );
