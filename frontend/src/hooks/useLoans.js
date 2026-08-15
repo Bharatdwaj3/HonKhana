@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getMyLoans, getAllLoans, returnBook, createLoanFine, createPayOrder, verifyPayment } from '../util/circulationApi';
+import { getMyLoans, getAllLoans, returnBook, createLoanFine, createPayOrder, verifyPayment, waiveLoanFine } from '../util/circulationApi';
 import { getBook } from '../util/catalogApi';
 import { loadRazorpayScript } from '../util/razorpay';
 
@@ -11,6 +11,8 @@ export function useLoans(isAdmin) {
   const [returnError, setReturnError] = useState('');
   const [payingFineForLoanId, setPayingFineForLoanId] = useState(null);
   const [payFineError, setPayFineError] = useState('');
+  const [waivingFineForLoanId, setWaivingFineForLoanId] = useState(null);
+  const [waiveFineError, setWaiveFineError] = useState('');
 
   const fetchLoans = async () => {
     setLoading(true);
@@ -101,6 +103,20 @@ export function useLoans(isAdmin) {
     }
   };
 
+  // Admin-only: writes off a loan's fine entirely, no payment involved.
+  const handleWaiveFine = async (loanId) => {
+    setWaivingFineForLoanId(loanId);
+    setWaiveFineError('');
+    try {
+      await waiveLoanFine(loanId);
+      await fetchLoans();
+    } catch (err) {
+      setWaiveFineError(err.response?.data?.message || 'Failed to waive fine — please try again.');
+    } finally {
+      setWaivingFineForLoanId(null);
+    }
+  };
+
   const isOverdue = (loan) => !loan.returnedAt && new Date(loan.dueAt) < new Date();
   const totalFinesOwed = loans.reduce((sum, loan) => sum + (loan.fineAmount || 0), 0);
 
@@ -116,5 +132,8 @@ export function useLoans(isAdmin) {
     handlePayFine,
     payingFineForLoanId,
     payFineError,
+    handleWaiveFine,
+    waivingFineForLoanId,
+    waiveFineError,
   };
 }

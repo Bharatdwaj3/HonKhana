@@ -12,17 +12,12 @@ const STATUS_BADGE_STYLES = {
   returned: 'bg-green-500/10 text-green-600 border-green-500/20',
 };
 
-// Splits one person's loans into the three status buckets.
-// A loan can appear in more than one bucket (e.g. an overdue loan with a
-// fine counts under both Fine and Borrow) since these aren't mutually exclusive.
 const splitLoansByStatus = (loans) => ({
   fine: loans.filter((loan) => (loan.fineAmount || 0) > 0),
   borrow: loans.filter((loan) => !loan.returnedAt),
   returned: loans.filter((loan) => loan.returnedAt),
 });
 
-// Builds one row per directory member (faculty + student), attaching
-// whichever loans belong to them. Members with zero loans still get a row.
 const buildMemberRows = (facultyList, studentList, loans, isOverdue) => {
   const withRole = [
     ...facultyList.map((p) => ({ ...p, role: 'faculty' })),
@@ -30,9 +25,10 @@ const buildMemberRows = (facultyList, studentList, loans, isOverdue) => {
   ];
 
   return withRole.map((person) => {
-    const personLoans = loans.filter((loan) => loan.userId === person.id);
+    const personLoans = loans.filter((loan) => loan.userId === person.userId);
     return {
       id: person.id,
+      userId: person.userId,
       name: `${person.Fname} ${person.Lname}`,
       role: person.role,
       loans: personLoans,
@@ -50,16 +46,12 @@ const StatCard = ({ label, value, danger }) => (
   </div>
 );
 
-// Muted plain text for zero, a colored pill only when the count is active —
-// keeps zero-states from competing visually with things that need attention.
 const CountCell = ({ count, tone }) => {
   if (count === 0) return <span className="text-foreground/40">—</span>;
   const styles = tone === 'danger' ? 'bg-red-500/10 text-red-500' : 'bg-foreground/5 text-foreground/70';
   return <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${styles}`}>{count}</span>;
 };
 
-// Slide-over drawer: shows one member's full loan breakdown via the same
-// clickable Fine/Borrow/Returned badges, without leaving the table view.
 const MemberDrawer = ({ member, renderLoan, onClose }) => {
   const [activeStatus, setActiveStatus] = useState(null);
   if (!member) return null;
@@ -151,6 +143,105 @@ const MembersTable = ({ rows, onSelect }) => (
   </div>
 );
 
+const UnresolvedLoansTable = ({ loans, isOverdue, onReturn, returningId, onWaiveFine, waivingFineForLoanId }) => {
+  const [tab, setTab] = useState('active');
+  const activeLoans = loans.filter((loan) => !loan.returnedAt);
+  const historyLoans = loans.filter((loan) => loan.returnedAt);
+  const visibleLoans = tab === 'active' ? activeLoans : historyLoans;
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => setTab('active')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            tab === 'active' ? 'bg-foreground/10 text-foreground' : 'text-foreground/50 hover:text-foreground'
+          }`}
+        >
+          Active ({activeLoans.length})
+        </button>
+        <button
+          onClick={() => setTab('history')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            tab === 'history' ? 'bg-foreground/10 text-foreground' : 'text-foreground/50 hover:text-foreground'
+          }`}
+        >
+          History ({historyLoans.length})
+        </button>
+      </div>
+
+      {visibleLoans.length === 0 ? (
+        <div className="bg-card rounded-2xl border border-border p-8 text-center text-foreground/50 text-sm">
+          No {tab === 'active' ? 'active' : 'returned'} orphaned loans.
+        </div>
+      ) : (
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-foreground/50 text-xs uppercase">
+                <th className="p-4 font-semibold">Book</th>
+                <th className="p-4 font-semibold">Due Date</th>
+                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Fine</th>
+                <th className="p-4 font-semibold"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleLoans.map((loan) => {
+                const overdue = isOverdue(loan);
+                return (
+                  <tr key={loan.id} className="border-b border-border last:border-0 hover:bg-foreground/5">
+                    <td className="p-4 font-semibold">{loan.book?.title ?? `Book #${loan.bookId}`}</td>
+                    <td className="p-4 text-foreground/60">{new Date(loan.dueAt).toLocaleDateString()}</td>
+                    <td className="p-4">
+                      {loan.returnedAt ? (
+                        <span className="text-green-600">Returned</span>
+                      ) : overdue ? (
+                        <span className="text-red-500">Overdue</span>
+                      ) : (
+                        <span className="text-foreground/60">Checked out</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {loan.fineAmount > 0 ? (
+                        <span className="text-red-500 font-semibold">₹{loan.fineAmount}</span>
+                      ) : (
+                        <span className="text-foreground/40">—</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-2 justify-end">
+                        {!loan.returnedAt && (
+                          <button
+                            onClick={() => onReturn(loan.id)}
+                            disabled={returningId === loan.id}
+                            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary text-white hover:bg-primary/90 transition-all disabled:opacity-50"
+                          >
+                            {returningId === loan.id ? 'Returning...' : 'Return'}
+                          </button>
+                        )}
+                        {loan.fineAmount > 0 && (
+                          <button
+                            onClick={() => onWaiveFine(loan.id)}
+                            disabled={waivingFineForLoanId === loan.id}
+                            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-foreground/5 border border-border hover:border-primary transition-all disabled:opacity-50"
+                          >
+                            {waivingFineForLoanId === loan.id ? 'Waiving...' : 'Waive Fine'}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LoansSection = ({ isAdmin }) => {
   const {
     loans,
@@ -164,6 +255,9 @@ const LoansSection = ({ isAdmin }) => {
     handlePayFine,
     payingFineForLoanId,
     payFineError,
+    handleWaiveFine,
+    waivingFineForLoanId,
+    waiveFineError,
   } = useLoans(isAdmin);
 
   const [facultyList, setFacultyList] = useState([]);
@@ -182,8 +276,6 @@ const LoansSection = ({ isAdmin }) => {
         setFacultyList(facultyRes.data);
         setStudentList(studentRes.data);
       } catch {
-        // Directory fetch failing shouldn't block the loans list itself —
-        // the table will just show fewer rows until it succeeds on retry.
       } finally {
         setDirectoryLoading(false);
       }
@@ -232,8 +324,8 @@ const LoansSection = ({ isAdmin }) => {
   }
 
   const allRows = buildMemberRows(facultyList, studentList, loans, isOverdue);
-  const directoryIds = new Set(allRows.map((row) => row.id));
-  const unresolvedLoans = loans.filter((loan) => !directoryIds.has(loan.userId));
+  const directoryUserIds = new Set(allRows.map((row) => row.userId).filter(Boolean));
+  const unresolvedLoans = loans.filter((loan) => !directoryUserIds.has(loan.userId));
 
   const visibleRows = allRows.filter((row) => {
     const matchesRole = roleFilter === 'all' || row.role === roleFilter;
@@ -250,6 +342,7 @@ const LoansSection = ({ isAdmin }) => {
       {error && <p className="text-sm text-primary mb-6">{error}</p>}
       {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
       {payFineError && <p className="text-sm text-red-500 mb-6">{payFineError}</p>}
+      {waiveFineError && <p className="text-sm text-red-500 mb-6">{waiveFineError}</p>}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard label="Active Loans" value={activeLoanCount} />
@@ -297,11 +390,18 @@ const LoansSection = ({ isAdmin }) => {
 
       {unresolvedLoans.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-lg font-bold mb-3">Unresolved Loans</h3>
+          <h3 className="text-lg font-bold mb-1">Unresolved Loans</h3>
           <p className="text-sm text-foreground/50 mb-3">
             These loans reference a user not found in the current directory.
           </p>
-          <div className="space-y-4">{unresolvedLoans.map(renderLoanItem)}</div>
+          <UnresolvedLoansTable
+            loans={unresolvedLoans}
+            isOverdue={isOverdue}
+            onReturn={handleReturn}
+            returningId={returningId}
+            onWaiveFine={handleWaiveFine}
+            waivingFineForLoanId={waivingFineForLoanId}
+          />
         </div>
       )}
 

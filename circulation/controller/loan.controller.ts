@@ -253,7 +253,7 @@ const renewBook = async (req: AuthRequest, res: ExpressResponse): Promise<void> 
   }
 };
 
-export { borrowBook, returnBook, listMyLoans, listAllLoans, listOverdueLoans, renewBook, attemptBorrow, createLoanFine };
+export { borrowBook, returnBook, listMyLoans, listAllLoans, listOverdueLoans, renewBook, attemptBorrow, createLoanFine, waiveLoanFine };
 
 // Creates (or returns the existing) payable `fine` record for an overdue loan's
 // fineAmount, so the existing Razorpay fine-payment flow can handle it. Idempotent —
@@ -292,6 +292,51 @@ const createLoanFine = async (req: AuthRequest, res: Response): Promise<void> =>
     res.status(200).json(fine);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to create fine for loan";
+    res.status(500).json({ message });
+  }
+};
+
+// Admin-only: writes off a loan's outstanding fine entirely. Unlike createLoanFine
+// (self-service, owner-only), this has no ownership check — that's the whole point,
+// since it also covers orphaned loans where the original user no longer exists.
+const waiveLoanFine = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const loanId = Number(req.params.id);
+    const adminId = req.user?.id;
+
+    const loan = await prisma.loan.findUnique({ where: { id: loanId } });
+    if (!loan) {
+      res.status(404).json({ message: "Loan not found" });
+      return;
+    }
+    if (!loan.fineAmount || loan.fineAmount <= 0) {
+      res.status(400).json({ message: "This loan has no outstanding fine" });
+      return;
+    }
+
+    const waivedAmount = loan.fineAmount;
+
+    await prisma.fine.upsert({
+      where: { loanId: loan.id },
+      update: { waived: true },
+      create: {
+        userId: loan.userId,
+        amount: waivedAmount,
+        reason: "Waived by admin",
+        issuedBy: adminId ?? loan.userId,
+        loanId: loan.id,
+        waived: true,
+      },
+    });
+
+    const updatedLoan = await prisma.loan.update({
+      where: { id: loan.id },
+      data: { fineAmount: 0 },
+    });
+
+    res.status(200).json(updatedLoan);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to waive fine";
     res.status(500).json({ message });
   }
 };

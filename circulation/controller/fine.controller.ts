@@ -84,6 +84,10 @@ const createPayOrder = async (req: AuthRequest, res: Response): Promise<void> =>
       res.status(409).json({ message: "This fine has already been paid" });
       return;
     }
+    if (fine.waived) {
+      res.status(409).json({ message: "This fine has been waived and cannot be paid" });
+      return;
+    }
 
     const order = await razorpay.orders.create({
       amount: fine.amount * 100, // Razorpay expects the amount in paise, not rupees

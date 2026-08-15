@@ -29,6 +29,7 @@ model fine {
   reason     String
   issuedBy   Int
   paid       Boolean   @default(false)
+  waived     Boolean   @default(false)
   createdAt  DateTime  @default(now())
   loanId     Int?      @unique
 }
