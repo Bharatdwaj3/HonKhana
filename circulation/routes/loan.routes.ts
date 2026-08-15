@@ -9,6 +9,7 @@ import {
   listOverdueLoans,
   renewBook,
   createLoanFine,
+  waiveLoanFine,
 } from "../controller/loan.controller.ts";
 import { runReminderCheck } from "../jobs/reminder.job.ts";
 
@@ -19,6 +20,7 @@ router.put("/:id/return", authUser, checkPermission("returnBook"), returnBook);
 router.get("/mine", authUser, checkPermission("viewLoan"), listMyLoans);
 router.put("/:id/renew", authUser, checkPermission("returnBook"), renewBook);
 router.post("/:id/create-fine", authUser, checkPermission("payFine"), createLoanFine);
+router.patch("/:id/waive-fine", authUser, checkPermission("issueFine"), waiveLoanFine);
 router.get("/overdue", authUser, checkPermission("listLoan"), listOverdueLoans);
 router.get("/", authUser, checkPermission("listLoan"), listAllLoans);
 

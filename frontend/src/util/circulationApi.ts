@@ -38,3 +38,4 @@ export const getMyFines = () => circulationApi.get('/fine/mine');
 export const createPayOrder = (fineId) => circulationApi.post(`/fine/${fineId}/pay-order`);
 export const verifyPayment = (data) => circulationApi.post('/fine/verify-payment', data);
 export const createLoanFine = (loanId) => circulationApi.post(`/loan/${loanId}/create-fine`);
+export const waiveLoanFine = (loanId) => circulationApi.patch(`/loan/${loanId}/waive-fine`);
