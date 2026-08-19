@@ -1,139 +1,65 @@
-import { useEffect, useState } from 'react';
-import { getMyLoans, getAllLoans, returnBook, createLoanFine, createPayOrder, verifyPayment, waiveLoanFine } from '../util/circulationApi';
-import { getBook } from '../util/catalogApi';
-import { loadRazorpayScript } from '../util/razorpay';
+import { useState, useEffect, useCallback } from 'react';
+import { listMyLoans, listAllLoans, returnBook, renewBook } from '../util/circulationApi';
 
-export function useLoans(isAdmin) {
+export function useLoans(isAdmin = false) {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [returningId, setReturningId] = useState(null);
   const [error, setError] = useState('');
-  const [returnError, setReturnError] = useState('');
-  const [payingFineForLoanId, setPayingFineForLoanId] = useState(null);
-  const [payFineError, setPayFineError] = useState('');
-  const [waivingFineForLoanId, setWaivingFineForLoanId] = useState(null);
-  const [waiveFineError, setWaiveFineError] = useState('');
+  const [returningId, setReturningId] = useState(null);
+  const [renewingId, setRenewingId] = useState(null);
 
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     setLoading(true);
     try {
-      const res = isAdmin ? await getAllLoans() : await getMyLoans();
-      const loansWithBooks = await Promise.all(
-        (Array.isArray(res.data) ? res.data : []).map(async (loan) => {
-          try {
-            const bookRes = await getBook(loan.bookId);
-            return { ...loan, book: bookRes.data };
-          } catch {
-            return { ...loan, book: null };
-          }
-        })
-      );
-      setLoans(loansWithBooks);
+      const res = isAdmin ? await listAllLoans() : await listMyLoans();
+      setLoans(Array.isArray(res.data) ? res.data : []);
       setError('');
     } catch (err) {
-      setError(err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.');
+      setError('Failed to fetch loans');
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin]);
 
   useEffect(() => {
     fetchLoans();
-  }, [isAdmin]);
+  }, [fetchLoans]);
 
-  const handleReturn = async (loanId) => {
-    setReturningId(loanId);
-    setReturnError('');
+  const handleReturn = async (id) => {
+    setReturningId(id);
     try {
-      await returnBook(loanId);
+      await returnBook(id);
       await fetchLoans();
     } catch (err) {
-      setReturnError(err.response?.data?.message || (err.response ? 'Something went wrong on our end.' : 'Cannot reach the server - check your network.'));
+      alert(err.response?.data?.message || 'Return failed');
     } finally {
       setReturningId(null);
     }
   };
 
-  const handlePayFine = async (loan) => {
-    setPayingFineForLoanId(loan.id);
-    setPayFineError('');
+  const handleRenew = async (id) => {
+    setRenewingId(id);
     try {
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        setPayFineError('Could not load the payment window — check your connection and try again.');
-        setPayingFineForLoanId(null);
-        return;
-      }
-
-      const { data: fine } = await createLoanFine(loan.id);
-      const { data } = await createPayOrder(fine.id);
-
-      const razorpayOptions = {
-        key: data.keyId,
-        amount: data.order.amount,
-        currency: data.order.currency,
-        order_id: data.order.id,
-        name: 'Library Fine Payment',
-        description: `Late fine for ${loan.book?.title ?? 'loan'}`,
-        handler: async (response) => {
-          try {
-            await verifyPayment({
-              fineId: fine.id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            await fetchLoans();
-          } catch (err) {
-            setPayFineError('Payment succeeded but verification failed — please contact support.');
-          } finally {
-            setPayingFineForLoanId(null);
-          }
-        },
-        modal: {
-          ondismiss: () => setPayingFineForLoanId(null),
-        },
-      };
-
-      const razorpayInstance = new window.Razorpay(razorpayOptions);
-      razorpayInstance.open();
-    } catch (err) {
-      setPayFineError(err.response?.data?.message || 'Failed to start payment — please try again.');
-      setPayingFineForLoanId(null);
-    }
-  };
-
-  // Admin-only: writes off a loan's fine entirely, no payment involved.
-  const handleWaiveFine = async (loanId) => {
-    setWaivingFineForLoanId(loanId);
-    setWaiveFineError('');
-    try {
-      await waiveLoanFine(loanId);
+      await renewBook(id);
       await fetchLoans();
     } catch (err) {
-      setWaiveFineError(err.response?.data?.message || 'Failed to waive fine — please try again.');
+      alert(err.response?.data?.message || 'Renewal failed');
     } finally {
-      setWaivingFineForLoanId(null);
+      setRenewingId(null);
     }
   };
 
   const isOverdue = (loan) => !loan.returnedAt && new Date(loan.dueAt) < new Date();
-  const totalFinesOwed = loans.reduce((sum, loan) => sum + (loan.fineAmount || 0), 0);
 
-  return {
-    loans,
-    loading,
-    error,
-    returnError,
-    returningId,
-    handleReturn,
-    isOverdue,
-    totalFinesOwed,
-    handlePayFine,
-    payingFineForLoanId,
-    payFineError,
-    handleWaiveFine,
-    waivingFineForLoanId,
-    waiveFineError,
+  return { 
+    loans, 
+    loading, 
+    error, 
+    returningId, 
+    renewingId, 
+    handleReturn, 
+    handleRenew, 
+    isOverdue, 
+    refreshLoans: fetchLoans 
   };
 }

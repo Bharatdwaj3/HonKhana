@@ -18,6 +18,8 @@ const LoansSection = ({
   returnError,
   returningId,
   handleReturn,
+  handleRenew,
+  renewingId,
   isOverdue,
   totalFinesOwed,
   handlePayFine,
@@ -60,7 +62,14 @@ const LoansSection = ({
         {error && <p className="text-sm text-primary mb-6">{error}</p>}
         {returnError && <p className="text-sm text-primary mb-6">{returnError}</p>}
         {payFineError && <p className="text-sm text-red-500 mb-6">{payFineError}</p>}
-        <LoansTable loans={loans} isOverdue={isOverdue} onReturn={handleReturn} returningId={returningId} />
+        <LoansTable 
+          loans={loans} 
+          isOverdue={isOverdue} 
+          onReturn={handleReturn} 
+          returningId={returningId} 
+          onRenew={handleRenew} 
+          renewingId={renewingId} 
+        />
         <div className="mt-8">
           <FinesSection />
         </div>
@@ -130,6 +139,8 @@ const LoansSection = ({
             isOverdue={isOverdue}
             onReturn={handleReturn}
             returningId={returningId}
+            onRenew={handleRenew}
+            renewingId={renewingId}
             onWaiveFine={handleWaiveFine}
             waivingFineForLoanId={waivingFineForLoanId}
             checkedOutLabel="Checked out"
