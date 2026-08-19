@@ -31,6 +31,7 @@ const LoansSection = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedMember, setSelectedMember] = useState(null);
+  const [showOverdueOnly, setShowOverdueOnly] = useState(false);
 
   if (loading || (isAdmin && directoryLoading)) {
     return (
@@ -74,7 +75,8 @@ const LoansSection = ({
   const visibleRows = allRows.filter((row) => {
     const matchesRole = roleFilter === 'all' || row.role === roleFilter;
     const matchesSearch = row.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesRole && matchesSearch;
+    const matchesOverdue = !showOverdueOnly || row.overdue > 0;
+    return matchesRole && matchesSearch && matchesOverdue;
   });
 
   const activeLoanCount = loans.filter((loan) => !loan.returnedAt).length;
@@ -90,7 +92,13 @@ const LoansSection = ({
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard label="Active Loans" value={activeLoanCount} />
-        <StatCard label="Overdue Items" value={overdueCount} danger={overdueCount > 0} />
+        <StatCard
+          label="Overdue Items"
+          value={overdueCount}
+          danger={overdueCount > 0}
+          onClick={() => setShowOverdueOnly((prev) => !prev)}
+          active={showOverdueOnly}
+        />
         <StatCard label="Unpaid Fines" value={`₹${totalFinesOwed}`} danger={totalFinesOwed > 0} />
         <StatCard label="Total Members" value={totalMembers} />
       </div>

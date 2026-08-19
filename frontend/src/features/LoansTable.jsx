@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BookOpen } from 'lucide-react';
 
 // Shared Active/History loans table, used both for a signed-in user's own
 // loans and for admin's unresolved-loans view. Pass `onWaiveFine` to show
@@ -16,7 +17,17 @@ const LoansTable = ({
   const [tab, setTab] = useState('active');
   const activeLoans = loans.filter((loan) => !loan.returnedAt);
   const historyLoans = loans.filter((loan) => loan.returnedAt);
-  const visibleLoans = tab === 'active' ? activeLoans : historyLoans;
+  const unsortedVisibleLoans = tab === 'active' ? activeLoans : historyLoans;
+
+  // Overdue loans first, then earliest due date first within each group.
+  // Numeric group keys (0/1) return 0 for equal-status pairs, which is
+  // what makes this sort stable — unlike a bare -1/1 ternary.
+  const visibleLoans = [...unsortedVisibleLoans].sort((a, b) => {
+    const aGroup = isOverdue(a) ? 0 : 1;
+    const bGroup = isOverdue(b) ? 0 : 1;
+    if (aGroup !== bGroup) return aGroup - bGroup;
+    return new Date(a.dueAt) - new Date(b.dueAt);
+  });
 
   return (
     <div>
@@ -48,6 +59,7 @@ const LoansTable = ({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-foreground/50 text-sm font-semibold uppercase tracking-wide">
+                <th className="p-4">Cover</th>
                 <th className="p-4">Book</th>
                 <th className="p-4">Due Date</th>
                 <th className="p-4">Status</th>
@@ -60,6 +72,15 @@ const LoansTable = ({
                 const overdue = isOverdue(loan);
                 return (
                   <tr key={loan.id} className="border-b border-border last:border-0 hover:bg-foreground/5">
+                    <td className="p-4">
+                      <div className="w-10 h-14 rounded bg-foreground/5 overflow-hidden flex items-center justify-center">
+                        {loan.book?.coverUrl ? (
+                          <img src={loan.book.coverUrl} className="w-full h-full object-cover" alt={loan.book.title} />
+                        ) : (
+                          <BookOpen size={16} className="text-foreground/20" />
+                        )}
+                      </div>
+                    </td>
                     <td className="p-4 font-semibold">{loan.book?.title ?? `Book #${loan.bookId}`}</td>
                     <td className="p-4 text-foreground/60">{new Date(loan.dueAt).toLocaleDateString()}</td>
                     <td className="p-4">

@@ -85,23 +85,27 @@ export default function Profile() {
         </div>
 
         <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setSection('loans')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-              section === 'loans' ? 'bg-primary text-white border border-primary' : 'bg-card border border-border text-foreground/60 hover:border-primary'
-            }`}
-          >
-            <BookOpen size={16} /> {isAdmin ? 'System Loans' : 'My Loans'}
-          </button>
-          {isAdmin && (
-            <button
-              onClick={() => setSection('books')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                section === 'books' ? 'bg-primary text-white border border-primary' : 'bg-card border border-border text-foreground/60 hover:border-primary'
-              }`}
-            >
-              <Library size={16} /> Books
-            </button>
+          {isAdmin ? (
+            <>
+              <button
+                onClick={() => setSection('loans')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                  section === 'loans' ? 'bg-primary text-white border border-primary' : 'bg-card border border-border text-foreground/60 hover:border-primary'
+                }`}
+              >
+                <BookOpen size={16} /> System Loans
+              </button>
+              <button
+                onClick={() => setSection('books')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                  section === 'books' ? 'bg-primary text-white border border-primary' : 'bg-card border border-border text-foreground/60 hover:border-primary'
+                }`}
+              >
+                <Library size={16} /> Books
+              </button>
+            </>
+          ) : (
+            <h2 className="text-lg font-bold">My Library Activity</h2>
           )}
         </div>
 
