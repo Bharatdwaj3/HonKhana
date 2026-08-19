@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Mail, Calendar, BookOpen, GraduationCap, Library } from 'lucide-react';
 import { fetchUser } from '../store/avatarSlice';
+import { useLoans } from '../hooks/useLoans';
+import StatCard from '../components/StatCard';
 import LoansSection from '../features/LoansSection';
 import BooksSection from '../features/BooksSection';
 
@@ -21,6 +23,9 @@ export default function Profile() {
     if (!user) dispatch(fetchUser());
   }, [user, dispatch]);
 
+  const isAdmin = user?.role === 'admin';
+  const loansState = useLoans(isAdmin);
+
   if (loading || !user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -31,12 +36,13 @@ export default function Profile() {
 
   const profile = getProfile(user);
   const isFaculty = Boolean(user.faculty);
-  const isAdmin = user.role === 'admin';
+  const activeLoanCount = loansState.loans.filter((loan) => !loan.returnedAt).length;
+  const overdueCount = loansState.loans.filter(loansState.isOverdue).length;
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-card rounded-2xl border border-border shadow-lg p-8 mb-8">
+        <div className="bg-card rounded-2xl border border-border shadow-lg p-8 mb-6">
           <div className="flex items-center gap-6 mb-6">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center ring-4 ring-background font-bold text-2xl text-primary flex-shrink-0">
               {user.avatar ? (
@@ -69,6 +75,13 @@ export default function Profile() {
               </div>
             )}
           </div>
+
+          {!isAdmin && !loansState.loading && (
+            <div className="grid grid-cols-2 gap-3 border-t border-border pt-4 mt-4">
+              <StatCard label="Active Loans" value={activeLoanCount} />
+              <StatCard label="Overdue" value={overdueCount} danger={overdueCount > 0} />
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2 mb-6">
@@ -92,7 +105,7 @@ export default function Profile() {
           )}
         </div>
 
-        {section === 'loans' && <LoansSection isAdmin={isAdmin} />}
+        {section === 'loans' && <LoansSection isAdmin={isAdmin} {...loansState} />}
 
         {section === 'books' && isAdmin && <BooksSection />}
       </div>

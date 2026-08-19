@@ -14,7 +14,7 @@ const FinesTable = ({ fines, payingId, onPay }) => {
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-left text-foreground/50 text-xs uppercase">
+          <tr className="border-b border-border text-left text-foreground/50 text-sm font-semibold uppercase tracking-wide">
             <th className="p-4 font-semibold">Reason</th>
             <th className="p-4 font-semibold">Date</th>
             <th className="p-4 font-semibold">Status</th>
