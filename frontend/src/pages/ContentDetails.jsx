@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { motion } from 'framer-motion';
+
 import { ArrowLeft, BookOpen, Building2, Hash, Tag, Copy, FileText, Bookmark } from 'lucide-react';
 import { getBook, getSimilarBooks } from '../util/catalogApi';
 import { borrowBook as borrowBookRequest } from '../util/circulationApi';
@@ -13,6 +13,8 @@ const ContentDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const bookmarkedBooks = useSelector((state) => state.bookmark.books);
+  const { user } = useSelector((state) => state.avatar);
+  const isAdmin = user?.role === 'admin';
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [borrowing, setBorrowing] = useState(false);
@@ -35,7 +37,7 @@ const ContentDetails = () => {
           setSimilarByAuthor([]);
           setSimilarByGenre([]);
         });
-      } catch (err) {
+      } catch {
         setError('Failed to load book details');
       } finally {
         setLoading(false);
@@ -129,9 +131,15 @@ const ContentDetails = () => {
             </div>
 
             <div className="flex flex-wrap gap-4 mt-auto pt-8 border-t border-border">
-              <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
-                {borrowing ? 'Borrowing...' : 'Borrow Book'}
-              </button>
+              {isAdmin ? (
+                <button onClick={() => navigate(`/staff/new?edit=${id}`)} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all">
+                  Edit Book
+                </button>
+              ) : (
+                <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
+                  {borrowing ? 'Borrowing...' : 'Borrow Book'}
+                </button>
+              )}
 
               {book.pdfUrl && (
                 <button onClick={() => navigate(`/read/${id}`)} className="flex items-center gap-2 px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-all">

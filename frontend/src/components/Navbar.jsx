@@ -12,6 +12,7 @@ const getProfile = (user) => user?.faculty || user?.student || null;
 const getDisplayName = (user) => {
   const profile = getProfile(user);
   if (profile) return `${profile.Fname} ${profile.Lname}`;
+  if (user?.role === 'admin') return 'System Administrator';
   return user?.email || 'User';
 };
 
@@ -52,6 +53,15 @@ const Navbar = () => {
     }
   };
 
+  // Hands off to Explore's ?q= param, which useExploreBooks already reads
+  // on mount — this was the missing half of that wiring.
+  const handleSearchSubmit = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      navigate(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+    }
+  };
+
   if (loading) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
@@ -85,6 +95,7 @@ const Navbar = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchSubmit}
                 placeholder="Search books..."
                 className="bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none w-48"
               />
@@ -231,6 +242,7 @@ const Navbar = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearchSubmit}
                   placeholder="Search books..."
                   className="bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none flex-grow"
                   autoFocus

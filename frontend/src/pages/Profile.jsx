@@ -11,6 +11,7 @@ const getProfile = (user) => user?.faculty || user?.student || null;
 const getDisplayName = (user) => {
   const profile = getProfile(user);
   if (profile) return `${profile.Fname} ${profile.Lname}`;
+  if (user?.role === 'admin') return 'System Administrator';
   return user?.email || 'User';
 };
 
@@ -71,7 +72,7 @@ export default function Profile() {
             {profile && (
               <div className="flex items-center gap-2">
                 {isFaculty ? <GraduationCap size={16} className="text-foreground/40" /> : <BookOpen size={16} className="text-foreground/40" />}
-                {isFaculty ? profile.Expertise : profile.Subjects}
+                {(isFaculty ? profile.Expertise : profile.Subjects)?.replace(/_/g, ' ')}
               </div>
             )}
           </div>
