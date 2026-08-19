@@ -43,6 +43,7 @@ model book {
   availableCopies Int       @default(1)
   coverUrl        String?
   pdfUrl          String?
+  description     String?
   addedByUserId   Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
