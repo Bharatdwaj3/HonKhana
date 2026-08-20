@@ -9,6 +9,7 @@ import MembersTable from './MembersTable';
 import MemberDrawer from './MemberDrawer';
 import MemberSearchFilter from './MemberSearchFilter';
 import FinesSection from './FinesSection';
+import { borrowBook } from '../util/circulationApi';
 
 const LoansSection = ({
   isAdmin,
@@ -35,6 +36,12 @@ const LoansSection = ({
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedMember, setSelectedMember] = useState(null);
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
+  const [showIssueModal, setShowIssueModal] = useState(false);
+  const [issueBookId, setIssueBookId] = useState('');
+  const [issueUserId, setIssueUserId] = useState('');
+  const [issuing, setIssuing] = useState(false);
+  const [issueError, setIssueError] = useState('');
+  const [issueSuccess, setIssueSuccess] = useState('');
 
   if (loading || (isAdmin && directoryLoading)) {
     return (
@@ -105,14 +112,14 @@ const LoansSection = ({
       <div className="flex flex-wrap gap-3 mb-6">
         <button
           type="button"
-          onClick={() => alert("Issue Loan modal – coming next. Will call borrowBook({ bookId, userId })")}
+          onClick={() => { setShowIssueModal(true); setIssueError(""); setIssueSuccess(""); }}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all"
         >
           <span className="text-lg leading-none">+</span> Issue Loan
         </button>
         <button
           type="button"
-          onClick={() => alert("Add New Book – switch to Books tab or open modal. API ready: catalogApi.addBook(data)")}
+          onClick={() => window.location.href = "/staff/new"}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground/10 text-foreground border border-border rounded-xl text-sm font-semibold hover:border-primary hover:text-primary transition-all"
         >
           <span className="text-lg leading-none">+</span> Add New Book
@@ -164,6 +171,80 @@ const LoansSection = ({
             checkedOutLabel="Checked out"
             emptyNoun="orphaned loans"
           />
+        </div>
+      )}
+
+      {/* Issue Loan Modal */}
+      {showIssueModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-bold mb-4">Issue Loan</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Book ID</label>
+                <input
+                  type="number"
+                  value={issueBookId}
+                  onChange={(e) => setIssueBookId(e.target.value)}
+                  placeholder="e.g. 42"
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Member</label>
+                <select
+                  value={issueUserId}
+                  onChange={(e) => setIssueUserId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="">Select a member…</option>
+                  {[...facultyList, ...studentList].map((m) => (
+                    <option key={m.id || m.userId} value={m.id || m.userId}>
+                      {m.name || m.displayName || m.email} ({m.role || "member"})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {issueError && <p className="text-sm text-red-500">{issueError}</p>}
+              {issueSuccess && <p className="text-sm text-green-600">{issueSuccess}</p>}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                disabled={issuing || !issueBookId || !issueUserId}
+                onClick={async () => {
+                  setIssuing(true);
+                  setIssueError("");
+                  setIssueSuccess("");
+                  try {
+                    await borrowBook({ bookId: Number(issueBookId), userId: Number(issueUserId) });
+                    setIssueSuccess("Loan issued successfully");
+                    setIssueBookId("");
+                    setIssueUserId("");
+                    setTimeout(() => setShowIssueModal(false), 1200);
+                  } catch (err) {
+                    setIssueError(err.response?.data?.message || "Failed to issue loan");
+                  } finally {
+                    setIssuing(false);
+                  }
+                }}
+                className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+              >
+                {issuing ? "Issuing…" : "Issue Loan"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowIssueModal(false)}
+                className="px-4 py-2.5 border border-border rounded-xl text-sm font-semibold hover:bg-foreground/5 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

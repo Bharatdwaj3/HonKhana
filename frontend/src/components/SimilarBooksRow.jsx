@@ -21,7 +21,7 @@ export default function SimilarBooksRow({ title, books, emptyMessage }) {
   return (
     <div className="mt-12">
       <h2 className="text-lg font-bold text-foreground mb-4">{title}</h2>
-      <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-thin">
+      <div className="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-thin">
         {books.map((book, index) => (
           <motion.article
             key={book.id}
@@ -29,7 +29,7 @@ export default function SimilarBooksRow({ title, books, emptyMessage }) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
             whileHover={{ y: -4 }}
-            className="content-card group cursor-pointer flex-shrink-0 w-40"
+            className="content-card group cursor-pointer flex-shrink-0 w-36"
             onClick={() => navigate(`/content/${book.id}`)}
           >
             <div className="relative aspect-[2/3] bg-foreground/5 overflow-hidden rounded-t-xl">

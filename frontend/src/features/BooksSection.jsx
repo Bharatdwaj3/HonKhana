@@ -87,7 +87,7 @@ const BooksSection = () => {
       {/* Add New Book quick action */}
       <button
         type="button"
-        onClick={() => alert("Add New Book modal coming next.\nAPI ready: catalogApi.addBook(data)")}
+        onClick={() => window.location.href = "/staff/new"}
         className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all whitespace-nowrap"
       >
         <span className="text-lg leading-none">+</span> Add New Book
