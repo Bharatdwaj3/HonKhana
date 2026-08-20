@@ -101,6 +101,24 @@ const LoansSection = ({
       {payFineError && <p className="text-sm text-red-500 mb-6">{payFineError}</p>}
       {waiveFineError && <p className="text-sm text-red-500 mb-6">{waiveFineError}</p>}
 
+      {/* Admin quick-action buttons */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <button
+          type="button"
+          onClick={() => alert("Issue Loan modal – coming next. Will call borrowBook({ bookId, userId })")}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all"
+        >
+          <span className="text-lg leading-none">+</span> Issue Loan
+        </button>
+        <button
+          type="button"
+          onClick={() => alert("Add New Book – switch to Books tab or open modal. API ready: catalogApi.addBook(data)")}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground/10 text-foreground border border-border rounded-xl text-sm font-semibold hover:border-primary hover:text-primary transition-all"
+        >
+          <span className="text-lg leading-none">+</span> Add New Book
+        </button>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard label="Active Loans" value={activeLoanCount} />
         <StatCard

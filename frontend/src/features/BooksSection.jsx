@@ -83,6 +83,15 @@ const BooksSection = () => {
             className="bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none flex-grow"
           />
         </div>
+
+      {/* Add New Book quick action */}
+      <button
+        type="button"
+        onClick={() => alert("Add New Book modal coming next.\nAPI ready: catalogApi.addBook(data)")}
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all whitespace-nowrap"
+      >
+        <span className="text-lg leading-none">+</span> Add New Book
+      </button>
         <div className="flex gap-2 flex-wrap">
           {STATUS_FILTERS.map((status) => (
             <button

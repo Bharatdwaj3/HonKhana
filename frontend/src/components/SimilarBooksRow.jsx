@@ -3,10 +3,20 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
 
-export default function SimilarBooksRow({ title, books }) {
+export default function SimilarBooksRow({ title, books, emptyMessage }) {
   const navigate = useNavigate();
 
-  if (!books || books.length === 0) return null;
+  if (!books || books.length === 0) {
+    if (!emptyMessage) return null;
+    return (
+      <div className="mt-12">
+        <h2 className="text-lg font-bold text-foreground mb-4">{title}</h2>
+        <div className="rounded-2xl border border-border bg-card/50 px-6 py-8 text-center text-sm text-foreground/50">
+          {emptyMessage}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-12">
