@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { BookOpen, Star, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useBooks } from '../hooks/useBooks';
+import { addBook } from '../util/catalogApi';
 import BookListItem from '../components/BookListItem';
 
 const STATUS_FILTERS = ['All', 'Featured', 'Weekly Reads', 'Out of Stock'];
@@ -25,12 +26,23 @@ const BooksSection = () => {
     handleBulkWeeklyRead,
     toggleFeatured,
     toggleWeeklyRead,
+    refetch,
   } = useBooks();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [genreFilter, setGenreFilter] = useState(null);
   const [page, setPage] = useState(1);
+
+  // Add New Book modal
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newAuthor, setNewAuthor] = useState("");
+  const [newGenre, setNewGenre] = useState("");
+  const [newCopies, setNewCopies] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [addSuccess, setAddSuccess] = useState("");
 
   const availableGenres = useMemo(() => {
     const genres = new Set();
@@ -87,7 +99,7 @@ const BooksSection = () => {
       {/* Add New Book quick action */}
       <button
         type="button"
-        onClick={() => window.location.href = "/staff/new"}
+        onClick={() => { setShowAddModal(true); setAddError(""); setAddSuccess(""); setNewTitle(""); setNewAuthor(""); setNewGenre(""); setNewCopies(1); }}
         className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all whitespace-nowrap"
       >
         <span className="text-lg leading-none">+</span> Add New Book
@@ -207,6 +219,109 @@ const BooksSection = () => {
         </>
       )}
     </div>
+
+      {/* Add New Book Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-bold mb-4">Add New Book</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Title *</label>
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="Book title"
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Author *</label>
+                <input
+                  type="text"
+                  value={newAuthor}
+                  onChange={(e) => setNewAuthor(e.target.value)}
+                  placeholder="Author name"
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Genre</label>
+                <input
+                  type="text"
+                  value={newGenre}
+                  onChange={(e) => setNewGenre(e.target.value)}
+                  placeholder="e.g. SCIENCE_FICTION"
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Number of Copies</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={newCopies}
+                  onChange={(e) => setNewCopies(Number(e.target.value) || 1)}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              {addError && <p className="text-sm text-red-500">{addError}</p>}
+              {addSuccess && <p className="text-sm text-green-600">{addSuccess}</p>}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  disabled={adding || !newTitle.trim() || !newAuthor.trim()}
+                  onClick={async () => {
+                    setAdding(true);
+                    setAddError("");
+                    setAddSuccess("");
+                    try {
+                      const payload = {
+                        title: newTitle.trim(),
+                        author: newAuthor.trim(),
+                        genre: newGenre.trim()
+                          ? [newGenre.trim().toUpperCase().replace(/\s+/g, "_")]
+                          : [],
+                        totalCopies: newCopies,
+                        availableCopies: newCopies,
+                      };
+                      await addBook(payload);
+                      setAddSuccess("Book added successfully!");
+                      await refetch();
+                      setTimeout(() => setShowAddModal(false), 900);
+                    } catch (err) {
+                      setAddError(
+                        err?.response?.data?.message ||
+                          err.message ||
+                          "Failed to add book"
+                      );
+                    } finally {
+                      setAdding(false);
+                    }
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+                >
+                  {adding ? "Adding…" : "Add Book"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2.5 border border-border rounded-xl text-sm font-semibold hover:bg-foreground/5 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
   );
 };
 

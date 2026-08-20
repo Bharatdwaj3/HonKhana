@@ -97,5 +97,6 @@ export function useBooks() {
     handleBulkWeeklyRead,
     toggleFeatured,
     toggleWeeklyRead,
+    refetch: fetchBooks,
   };
 }
