@@ -67,7 +67,6 @@ export default function Profile() {
             </div>
             <div className="flex items-center gap-2">
               <Calendar size={16} className="text-foreground/40" />
-              
               Joined {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </div>
             {profile && (

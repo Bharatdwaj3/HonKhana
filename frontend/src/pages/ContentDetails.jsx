@@ -18,53 +18,146 @@ const ContentDetails = () => {
   const [loading, setLoading] = useState(true);
   const [borrowing, setBorrowing] = useState(false);
   const [borrowMessage, setBorrowMessage] = useState('');
+  const [error, setError] = useState('');
   const [similarByAuthor, setSimilarByAuthor] = useState([]);
+  const [similarByGenre, setSimilarByGenre] = useState([]);
+
+  const isBookmarked = book ? bookmarkedBooks.some((b) => b.id === book.id) : false;
 
   useEffect(() => {
-    getBook(id).then(({data}) => {
-      setBook(data);
-      getSimilarBooks(id).then(res => setSimilarByAuthor(res.data.byAuthor || []));
-      setLoading(false);
-    }).catch(() => navigate('/explore'));
-  }, [id, navigate]);
+    const fetchBook = async () => {
+      try {
+        const { data } = await getBook(id);
+        setBook(data);
+        getSimilarBooks(id).then((res) => {
+          setSimilarByAuthor(res.data.byAuthor || []);
+          setSimilarByGenre(res.data.byGenre || []);
+        }).catch(() => {
+          setSimilarByAuthor([]);
+          setSimilarByGenre([]);
+        });
+      } catch {
+        setError('Failed to load book details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBook();
+  }, [id]);
 
   const handleBorrow = async () => {
     setBorrowing(true);
+    setBorrowMessage('');
     try {
       await borrowBookRequest({ bookId: Number(id) });
-      setBorrowMessage('Success!');
-    } catch (err) { setBorrowMessage('Failed'); }
-    setBorrowing(false);
+      setBorrowMessage('Book borrowed successfully!');
+      const { data } = await getBook(id);
+      setBook(data);
+    } catch (err) {
+      setBorrowMessage(err.response?.data?.message || 'Failed to borrow book');
+    } finally {
+      setBorrowing(false);
+    }
   };
 
-  if (loading || !book) return <div className="p-20 text-center animate-spin">...</div>;
+  const handleToggleBookmark = () => {
+    dispatch(toggleBookmark({ id: book.id, title: book.title, author: book.author, coverUrl: book.coverUrl }));
+  };
 
-  return (
-    <div className="pt-28 pb-20 px-6 max-w-4xl mx-auto">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 mb-8 text-foreground/60"><ArrowLeft size={20} /> Back</button>
-      <div className="grid md:grid-cols-12 gap-12">
-        <div className="md:col-span-4">
-          <div className="aspect-[2/3] rounded-2xl overflow-hidden border shadow-xl bg-card">
-            {book.coverUrl ? <img src={book.coverUrl} className="w-full h-full object-cover" alt={book.title} /> : <BookOpen className="m-auto text-foreground/20" size={48} />}
-          </div>
-        </div>
-        <div className="md:col-span-8 flex flex-col">
-          <h1 className="text-4xl font-black mb-2 leading-tight">{book.title}</h1>
-          <p className="text-xl text-foreground/60 mb-6">{book.author}</p>
-          {book.description && <p className="mb-8 text-foreground/80 leading-relaxed italic border-l-4 border-primary/20 pl-4">{book.description}</p>}
-          <div className="flex gap-4 pt-8 border-t mt-auto">
-            {isAdmin ? (
-              <button onClick={() => navigate(`/staff/new?edit=${id}`)} className="px-8 py-3 bg-primary text-white rounded-xl font-bold">Edit Book</button>
-            ) : (
-              <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="px-8 py-3 bg-primary text-white rounded-xl font-bold">Borrow</button>
-            )}
-            {book.pdfUrl && <button onClick={() => navigate(`/read/${id}`)} className="px-8 py-3 bg-card border rounded-xl font-bold">Read PDF</button>}
-          </div>
-          {borrowMessage && <p className="mt-4 text-sm font-semibold text-primary">{borrowMessage}</p>}
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !book) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-6">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error || 'Book not found'}</p>
+          <button onClick={() => navigate(-1)} className="text-primary hover:underline flex items-center gap-2">
+            <ArrowLeft size={16} /> Go Back
+          </button>
         </div>
       </div>
-      <SimilarBooksRow title="More by this author" books={similarByAuthor} />
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
+      <div className="max-w-4xl mx-auto">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-foreground/60 hover:text-foreground mb-8 transition-colors">
+          <ArrowLeft size={20} /> Back to Catalog
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div className="md:col-span-4">
+            <div className="aspect-[2/3] rounded-2xl overflow-hidden border border-border shadow-2xl bg-card">
+              {book.coverUrl ? (
+                <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <BookOpen size={64} className="text-foreground/10" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="md:col-span-8 flex flex-col">
+            <div className="flex items-start justify-between gap-4 mb-2">
+              <h1 className="text-4xl font-black tracking-tight">{book.title}</h1>
+              <button onClick={handleToggleBookmark} aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'} className="shrink-0 p-2 rounded-xl border border-border hover:bg-foreground/5 transition-all">
+                <Bookmark size={22} className={isBookmarked ? 'fill-primary text-primary' : 'text-foreground/60'} />
+              </button>
+            </div>
+            <p className="text-xl text-foreground/60 mb-6 font-medium">{book.author}</p>
+
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="space-y-4 text-foreground/70">
+                <div className="flex items-center gap-3"><Building2 size={18} /><span>{book.publisher}</span></div>
+                <div className="flex items-center gap-3"><Hash size={18} /><span>ISBN: {book.isbn}</span></div>
+              </div>
+              <div className="space-y-4 text-foreground/70">
+                <div className="flex items-center gap-3"><Tag size={18} />
+                  <div className="flex flex-wrap gap-1">
+                    {book.genre.map(g => <span key={g} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{g.replace('_', ' ')}</span>)}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3"><Copy size={18} /><span>{book.availableCopies} of {book.totalCopies} copies available</span></div>
+              </div>
+            </div>
+
+            {book.description && (
+              <p className="text-foreground/70 leading-relaxed mb-8">{book.description}</p>
+            )}
+
+            <div className="flex flex-wrap gap-4 mt-auto pt-8 border-t border-border">
+              {isAdmin ? (
+                <button onClick={() => navigate(`/staff/new?edit=${id}`)} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all">
+                  Edit Book
+                </button>
+              ) : (
+                <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
+                  {borrowing ? 'Borrowing...' : 'Borrow Book'}
+                </button>
+              )}
+
+              {book.pdfUrl && (
+                <button onClick={() => navigate(`/read/${id}`)} className="flex items-center gap-2 px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-all">
+                  <FileText size={20} /> Read Now
+                </button>
+              )}
+            </div>
+            {borrowMessage && <p className={`mt-4 text-sm font-medium ${borrowMessage.includes('success') ? 'text-green-500' : 'text-red-500'}`}>{borrowMessage}</p>}
+          </div>
+        </div>
+        <SimilarBooksRow title="More by this author" books={similarByAuthor} />
+        <SimilarBooksRow title="More in this genre" books={similarByGenre} />
+      </div>
     </div>
   );
 };
+
 export default ContentDetails;
