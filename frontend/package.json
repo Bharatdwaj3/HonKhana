@@ -23,6 +23,8 @@
     "@tiptap/react": "^3.18.0",
     "@tiptap/starter-kit": "^3.18.0",
     "axios": "^1.13.2",
+    "clsx": "^2.1.1",
+    "framer-motion": "^13.1.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.563.0",
     "material": "^0.9.25",
@@ -32,6 +34,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.12.0",
     "styled-components": "^6.1.19",
+    "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
