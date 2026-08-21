@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getBooks, setBulkFeatured, setBulkWeeklyRead } from '../util/catalogApi';
 
-export function useBooks() {
+export function useBooks({ enabled = true } = {}) {
   const [bookList, setBookList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,8 +22,9 @@ export function useBooks() {
   };
 
   useEffect(() => {
+    if (!enabled) return;
     fetchBooks();
-  }, []);
+  }, [enabled]);
 
   const toggleBookSelection = (id) => {
     setSelectedBookIds((prev) => {
@@ -64,8 +65,6 @@ export function useBooks() {
     }
   };
 
-  // Single-book toggles reuse the bulk endpoints with a one-item array —
-  // no separate single-book endpoint needed.
   const toggleFeatured = async (book) => {
     setError('');
     try {

@@ -9,7 +9,8 @@ import MembersTable from './MembersTable';
 import MemberDrawer from './MemberDrawer';
 import MemberSearchFilter from './MemberSearchFilter';
 import FinesSection from './FinesSection';
-import { borrowBook } from '../util/circulationApi';
+import { issueLoan } from '../util/circulationApi';
+import { useBooks } from '../hooks/useBooks';
 
 const LoansSection = ({
   isAdmin,
@@ -37,11 +38,18 @@ const LoansSection = ({
   const [selectedMember, setSelectedMember] = useState(null);
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [showIssueModal, setShowIssueModal] = useState(false);
-  const [issueBookId, setIssueBookId] = useState('');
+  const [issueBook, setIssueBook] = useState(null);
+  const [bookQuery, setBookQuery] = useState('');
   const [issueUserId, setIssueUserId] = useState('');
   const [issuing, setIssuing] = useState(false);
   const [issueError, setIssueError] = useState('');
   const [issueSuccess, setIssueSuccess] = useState('');
+  const { bookList: issueBookOptions } = useBooks({ enabled: showIssueModal });
+  const bookResults = bookQuery.trim()
+    ? issueBookOptions
+        .filter((b) => `${b.title} ${b.author}`.toLowerCase().includes(bookQuery.trim().toLowerCase()))
+        .slice(0, 8)
+    : [];
 
   if (loading || (isAdmin && directoryLoading)) {
     return (
@@ -182,14 +190,37 @@ const LoansSection = ({
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1.5">Book ID</label>
-                <input
-                  type="number"
-                  value={issueBookId}
-                  onChange={(e) => setIssueBookId(e.target.value)}
-                  placeholder="e.g. 42"
-                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
+                <label className="block text-sm font-medium mb-1.5">Book</label>
+                {issueBook ? (
+                  <div className="flex items-center justify-between px-3 py-2 rounded-xl border border-border bg-background text-sm">
+                    <span className="truncate">{issueBook.title} — {issueBook.author}</span>
+                    <button type="button" onClick={() => setIssueBook(null)} className="text-xs text-foreground/50 hover:text-foreground ml-2">Change</button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      value={bookQuery}
+                      onChange={(e) => setBookQuery(e.target.value)}
+                      placeholder="Search title or author…"
+                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    {bookResults.length > 0 && (
+                      <div className="mt-1 max-h-40 overflow-y-auto rounded-xl border border-border bg-background">
+                        {bookResults.map((b) => (
+                          <button
+                            key={b.id}
+                            type="button"
+                            onClick={() => { setIssueBook(b); setBookQuery(''); }}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-foreground/5"
+                          >
+                            {b.title} — {b.author}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -215,15 +246,16 @@ const LoansSection = ({
             <div className="flex gap-3 mt-6">
               <button
                 type="button"
-                disabled={issuing || !issueBookId || !issueUserId}
+                disabled={issuing || !issueBook || !issueUserId}
                 onClick={async () => {
                   setIssuing(true);
                   setIssueError("");
                   setIssueSuccess("");
                   try {
-                    await borrowBook({ bookId: Number(issueBookId), userId: Number(issueUserId) });
+                    await issueLoan({ bookId: issueBook.id, userId: Number(issueUserId) });
                     setIssueSuccess("Loan issued successfully");
-                    setIssueBookId("");
+                    setIssueBook(null);
+                    setBookQuery("");
                     setIssueUserId("");
                     setTimeout(() => setShowIssueModal(false), 1200);
                   } catch (err) {

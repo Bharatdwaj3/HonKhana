@@ -3,6 +3,7 @@ import { authUser } from "../middleware/auth.middleware.ts";
 import checkPermission from "../middleware/permission.middleware.ts";
 import { 
   borrowBook, 
+  issueLoanForMember,
   returnBook, 
   listMyLoans, 
   listAllLoans, 
@@ -16,6 +17,7 @@ import { runReminderCheck } from "../jobs/reminder.job.ts";
 const router = Router();
 
 router.post("/", authUser, checkPermission("borrowBook"), borrowBook);
+router.post("/issue", authUser, checkPermission("issueLoan"), issueLoanForMember);
 router.put("/:id/return", authUser, checkPermission("returnBook"), returnBook);
 router.get("/mine", authUser, checkPermission("viewLoan"), listMyLoans);
 router.put("/:id/renew", authUser, checkPermission("returnBook"), renewBook);

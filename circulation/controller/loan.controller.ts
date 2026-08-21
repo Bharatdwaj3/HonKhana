@@ -112,6 +112,41 @@ const borrowBook = async (req: AuthRequest, res: ExpressResponse): Promise<void>
   }
 };
 
+// Admin-only: issues a loan on behalf of a chosen member. `borrowBook` above
+// always uses the caller's own id/role — that's correct for self-service
+// borrowing, but useless for an admin issuing on someone else's behalf
+// (admins have a 0-loan cap, so it would always 403). This looks up the
+// target member's real role server-side rather than trusting the client.
+const issueLoanForMember = async (req: AuthRequest, res: ExpressResponse): Promise<void> => {
+  try {
+    const { bookId, userId } = req.body;
+    if (!bookId || !userId) {
+      res.status(400).json({ message: "bookId and userId are required" });
+      return;
+    }
+
+    const memberRes = await fetch(`${MEMBERS_SERVICE_URL}/internal/users/by-ids?ids=${Number(userId)}`, {
+      headers: { "x-internal-secret": INTERNAL_SERVICE_SECRET },
+    });
+    if (!memberRes.ok) {
+      res.status(502).json({ message: "Could not verify member" });
+      return;
+    }
+    const members = await memberRes.json();
+    const member = Array.isArray(members) ? members[0] : null;
+    if (!member) {
+      res.status(404).json({ message: "Member not found" });
+      return;
+    }
+
+    const result = await attemptBorrow(Number(userId), member.role, Number(bookId));
+    res.status(result.status).json(result.body);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to issue loan";
+    res.status(500).json({ message });
+  }
+};
+
 const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const loanId = Number(req.params.id);
@@ -253,7 +288,7 @@ const renewBook = async (req: AuthRequest, res: ExpressResponse): Promise<void> 
   }
 };
 
-export { borrowBook, returnBook, listMyLoans, listAllLoans, listOverdueLoans, renewBook, attemptBorrow, createLoanFine, waiveLoanFine };
+export { borrowBook, issueLoanForMember, returnBook, listMyLoans, listAllLoans, listOverdueLoans, renewBook, attemptBorrow, createLoanFine, waiveLoanFine };
 
 // Creates (or returns the existing) payable `fine` record for an overdue loan's
 // fineAmount, so the existing Razorpay fine-payment flow can handle it. Idempotent —
