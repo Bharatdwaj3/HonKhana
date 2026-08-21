@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 
 export const Hero = ({ spotlightBook }) => {
   return (
@@ -46,14 +46,14 @@ export const Hero = ({ spotlightBook }) => {
         </div>
       </motion.div>
 
-      <div className="hidden lg:flex flex-1 relative bg-background items-center justify-center">
+      <div className="hidden lg:flex flex-1 relative bg-background items-center justify-center px-12 xl:px-24">
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 0.15 }}
           transition={{ duration: 2, delay: 0.5 }}
           className="absolute w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(220,38,38,0.2)]"
         />
-        <div className="w-[40%] h-[30%] bg-accent/5 blur-[140px] rounded-full pointer-events-none" />
+        <div className="w-[50%] h-[45%] bg-accent/5 blur-[140px] rounded-full pointer-events-none" />
         <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px]" />
 
         {spotlightBook && (
@@ -61,29 +61,63 @@ export const Hero = ({ spotlightBook }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6 }}
-            className="relative z-10 flex items-center gap-8 max-w-md"
+            className="relative z-10 flex items-center gap-12 max-w-2xl w-full"
           >
-            <Link
-              to={`/content/${spotlightBook.id}`}
-              className="w-40 h-56 rounded-2xl overflow-hidden border border-border shadow-2xl shrink-0 hover:scale-105 transition-transform"
-            >
-              {spotlightBook.coverUrl ? (
-                <img src={spotlightBook.coverUrl} alt={spotlightBook.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-card flex items-center justify-center">
-                  <BookOpen size={32} className="text-foreground/10" />
-                </div>
-              )}
-            </Link>
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2 block">Featured Pick</span>
-              <h3 className="text-xl font-bold text-foreground mb-1">{spotlightBook.title}</h3>
-              <p className="text-sm text-foreground/50 mb-4">{spotlightBook.author}</p>
+            <div className="relative shrink-0">
+              {/* Stacked cards behind the cover for depth, purely decorative */}
+              <div className="absolute -top-4 -right-4 w-56 h-80 xl:w-64 xl:h-96 rounded-2xl bg-secondary/10 border border-border rotate-6" />
+              <div className="absolute -top-2 -right-2 w-56 h-80 xl:w-64 xl:h-96 rounded-2xl bg-primary/5 border border-border rotate-3" />
+
               <Link
                 to={`/content/${spotlightBook.id}`}
-                className="text-xs font-semibold uppercase tracking-wide text-foreground/70 border-b-2 border-border pb-1 hover:text-primary hover:border-primary transition-colors"
+                className="relative block w-56 h-80 xl:w-64 xl:h-96 rounded-2xl overflow-hidden border border-border shadow-2xl hover:scale-105 hover:-rotate-1 transition-transform duration-300"
+              >
+                {spotlightBook.coverUrl ? (
+                  <img src={spotlightBook.coverUrl} alt={spotlightBook.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-card flex items-center justify-center">
+                    <BookOpen size={48} className="text-foreground/10" />
+                  </div>
+                )}
+              </Link>
+            </div>
+
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-3">
+                <Sparkles size={13} strokeWidth={2.5} />
+                Featured Pick
+              </span>
+
+              {Array.isArray(spotlightBook.genre) && spotlightBook.genre.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {spotlightBook.genre.slice(0, 3).map((g) => (
+                    <span
+                      key={g}
+                      className="text-[10px] font-semibold uppercase tracking-wide text-foreground/50 border border-border rounded-full px-2.5 py-1"
+                    >
+                      {g.replace(/_/g, ' ')}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <h3 className="text-2xl xl:text-3xl font-bold text-foreground mb-2 leading-tight">
+                {spotlightBook.title}
+              </h3>
+              <p className="text-sm xl:text-base text-foreground/50 mb-6">{spotlightBook.author}</p>
+
+              {spotlightBook.synopsis && (
+                <p className="text-sm text-foreground/60 leading-relaxed mb-6 line-clamp-3">
+                  {spotlightBook.synopsis}
+                </p>
+              )}
+
+              <Link
+                to={`/content/${spotlightBook.id}`}
+                className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide bg-primary text-white rounded-full px-5 py-3 hover:bg-primary/90 transition-colors"
               >
                 View Book
+                <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
           </motion.div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Github, Instagram, Twitter } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -67,21 +68,16 @@ const Footer = () => {
             ¬© {currentYear} HonKhana. All rights reserved.
           </div>
 
-          <div className="mt-4 md:mt-0 flex items-center gap-6">
-            <div className="flex gap-5">
-              <Link to="/coming-soon" className="hover:text-primary transition-colors">
-                <span className="sr-only">Twitter</span>
-                Ìµè
-              </Link>
-              <Link to="/coming-soon" className="hover:text-primary transition-colors">
-                <span className="sr-only">Instagram</span>
-                IG
-              </Link>
-              <Link to="/coming-soon" className="hover:text-primary transition-colors">
-                <span className="sr-only">GitHub</span>
-                GH
-              </Link>
-            </div>
+          <div className="mt-4 md:mt-0 flex items-center gap-5">
+            <Link to="/coming-soon" aria-label="Twitter" className="text-muted-foreground hover:text-primary transition-colors">
+              <Twitter size={18} strokeWidth={2} />
+            </Link>
+            <Link to="/coming-soon" aria-label="Instagram" className="text-muted-foreground hover:text-primary transition-colors">
+              <Instagram size={18} strokeWidth={2} />
+            </Link>
+            <Link to="/coming-soon" aria-label="GitHub" className="text-muted-foreground hover:text-primary transition-colors">
+              <Github size={18} strokeWidth={2} />
+            </Link>
           </div>
         </div>
       </div>
