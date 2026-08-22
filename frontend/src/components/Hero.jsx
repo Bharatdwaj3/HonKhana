@@ -15,11 +15,11 @@ const SpineCover = ({ book, config }) => (
     animate={{ opacity: 1, y: config.translateY }}
     transition={{ duration: 0.9, delay: 0.2 }}
     style={{ transform: `rotate(${config.rotate}deg)`, zIndex: config.z }}
-    className={`relative ${config.widthClass} ${config.heightClass} ${config.marginClass} shrink-0`}
+    className={`relative ${config.widthClass} ${config.heightClass} ${config.marginClass} shrink-0 group`}
   >
     <Link
       to={`/content/${book.id}`}
-      className="block w-full h-full rounded-lg overflow-hidden border border-border shadow-2xl hover:scale-105 transition-transform duration-300"
+      className="block w-full h-full rounded-lg overflow-hidden border border-border shadow-2xl hover:scale-105 transition-transform duration-300 relative z-10"
     >
       {book.coverUrl ? (
         <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
@@ -29,6 +29,9 @@ const SpineCover = ({ book, config }) => (
         </div>
       )}
     </Link>
+
+    {/* Floor Ground Shadow */}
+    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-4/5 h-6 bg-black/40 blur-lg rounded-[100%] z-0 transform scale-y-50 pointer-events-none" />
   </motion.div>
 );
 
@@ -103,8 +106,17 @@ export const Hero = ({ spotlightBook, floatingBooks = [] }) => {
       <div className="hidden lg:flex flex-1 relative bg-background items-center justify-center px-12 xl:px-20 py-16 min-h-[36rem]">
         <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px] pointer-events-none" />
 
+        {/* Ambient Editorial Quotes */}
+        <blockquote className="absolute top-12 left-16 max-w-xs text-foreground/20 font-serif italic text-lg leading-snug pointer-events-none select-none">
+          “So we beat on, boats against the current, borne back ceaselessly into the past.”
+        </blockquote>
+
+        <blockquote className="absolute bottom-12 right-16 max-w-xs text-foreground/15 font-serif italic text-sm text-right pointer-events-none select-none">
+          “There is no friend as loyal as a book.”
+        </blockquote>
+
         {spotlightBook && (
-          <div className="relative flex items-end">
+          <div className="relative flex items-end z-10">
             {stackBooks.map((book, i) =>
               book ? <SpineCover key={book.id} book={book} config={STACK_CONFIG[i]} /> : null
             )}
