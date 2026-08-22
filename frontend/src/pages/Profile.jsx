@@ -106,7 +106,7 @@ export default function Profile() {
               </button>
             </>
           ) : (
-            <h2 className="text-lg font-bold">My Library Activity</h2>
+            <h2 className="font-display text-lg tracking-wide">My Library Activity</h2>
           )}
         </div>
 

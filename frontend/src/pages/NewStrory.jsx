@@ -194,7 +194,7 @@ export default function NewStory() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-3xl font-black tracking-tight">{isEditing ? 'Edit Book' : 'Add a Book'}</h1>
+            <h1 className="font-display text-3xl tracking-wide">{isEditing ? 'Edit Book' : 'Add a Book'}</h1>
           </motion.div>
 
           {error && (

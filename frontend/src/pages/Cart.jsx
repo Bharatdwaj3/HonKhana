@@ -27,7 +27,7 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-background text-foreground pt-28 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-black tracking-tight mb-8 flex items-center gap-3">
+        <h1 className="font-display text-3xl tracking-wide mb-8 flex items-center gap-3">
           <ShoppingCart size={28} /> My Cart
         </h1>
 

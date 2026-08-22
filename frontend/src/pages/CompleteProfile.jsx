@@ -58,7 +58,7 @@ export default function CompleteProfile() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full bg-card rounded-2xl border border-border shadow-lg p-8">
-        <h1 className="text-2xl font-black text-foreground text-center mb-2">Complete Your Profile</h1>
+        <h1 className="font-display text-2xl tracking-wide text-foreground text-center mb-2">Complete Your Profile</h1>
         <p className="text-foreground/60 text-sm text-center mb-6">
           Just a few more details as a {user?.role || 'member'}
         </p>

@@ -16,7 +16,7 @@ export default function ComingSoon() {
         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
           <Hammer size={28} className="text-primary" />
         </div>
-        <h1 className="text-3xl font-black tracking-tight mb-3">Coming Soon</h1>
+        <h1 className="font-display text-3xl tracking-wide mb-3">Coming Soon</h1>
         <p className="text-foreground/60 mb-8">
           This feature is still being worked on. Check back soon!
         </p>
