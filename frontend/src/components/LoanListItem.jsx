@@ -57,7 +57,7 @@ const LoanListItem = ({ loan, overdue, returning, onReturn, payingFine, onPayFin
         <button
           onClick={() => onReturn(loan.id)}
           disabled={returning}
-          className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+          className="btn-primary-sm disabled:opacity-50"
         >
           {returning ? 'Returning...' : 'Return'}
         </button>

@@ -88,7 +88,7 @@ const BooksSection = () => {
       <button
         type="button"
         onClick={() => window.location.href = "/staff/new"}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all whitespace-nowrap"
+        className="btn-primary whitespace-nowrap"
       >
         <span className="text-lg leading-none">+</span> Add New Book
       </button>
@@ -133,7 +133,7 @@ const BooksSection = () => {
           <button
             onClick={() => handleBulkFeatured(true)}
             disabled={bulkSaving}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+            className="btn-primary-sm disabled:opacity-50"
           >
             <Star size={14} /> Add to Featured
           </button>

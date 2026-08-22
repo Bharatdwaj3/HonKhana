@@ -23,7 +23,7 @@ class ErrorBoundary extends React.Component {
             <p className="text-foreground/60 mb-6">Please try reloading the page.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all"
+              className="btn-primary"
             >
               Reload
             </button>

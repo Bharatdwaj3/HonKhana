@@ -360,7 +360,7 @@ export default function NewStory() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-50"
+              className="w-full justify-center btn-primary disabled:opacity-50"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {saving ? (isEditing ? 'Saving...' : 'Adding...') : (isEditing ? 'Save Changes' : 'Add Book')}

@@ -90,7 +90,7 @@ const Cart = () => {
             <button
               onClick={handleCheckout}
               disabled={checkingOut}
-              className="w-full px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
+              className="w-full btn-primary disabled:opacity-50"
             >
               {checkingOut ? 'Checking out...' : 'Checkout — Borrow All'}
             </button>

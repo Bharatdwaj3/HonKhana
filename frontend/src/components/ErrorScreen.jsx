@@ -17,7 +17,7 @@ export default function ErrorScreen({ icon, code, title, message, actionLabel = 
 
         <Link
           to={actionTo}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all"
+          className="btn-primary"
         >
           {actionLabel}
         </Link>

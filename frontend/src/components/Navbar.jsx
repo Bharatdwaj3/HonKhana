@@ -208,7 +208,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all font-semibold text-sm shadow-lg shadow-primary/20"
+                  className="btn-primary"
                 >
                   Sign up
                 </Link>

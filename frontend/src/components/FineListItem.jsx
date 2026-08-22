@@ -31,7 +31,7 @@ const FineListItem = ({ fine, paying, onPay }) => {
         <button
           onClick={() => onPay(fine)}
           disabled={paying}
-          className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+          className="btn-primary-sm disabled:opacity-50"
         >
           {paying ? 'Processing...' : 'Pay'}
         </button>

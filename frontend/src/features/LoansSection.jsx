@@ -121,7 +121,7 @@ const LoansSection = ({
         <button
           type="button"
           onClick={() => { setShowIssueModal(true); setIssueError(""); setIssueSuccess(""); }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all"
+          className="btn-primary"
         >
           <span className="text-lg leading-none">+</span> Issue Loan
         </button>
@@ -264,7 +264,7 @@ const LoansSection = ({
                     setIssuing(false);
                   }
                 }}
-                className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all disabled:opacity-50"
+                className="flex-1 btn-primary disabled:opacity-50"
               >
                 {issuing ? "Issuing…" : "Issue Loan"}
               </button>

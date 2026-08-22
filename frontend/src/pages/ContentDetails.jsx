@@ -135,11 +135,11 @@ const ContentDetails = () => {
 
             <div className="flex flex-wrap gap-4 mt-auto pt-8 border-t border-border">
               {isAdmin ? (
-                <button onClick={() => navigate(`/staff/new?edit=${id}`)} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all">
+                <button onClick={() => navigate(`/staff/new?edit=${id}`)} className="btn-primary">
                   Edit Book
                 </button>
               ) : (
-                <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
+                <button onClick={handleBorrow} disabled={borrowing || book.availableCopies === 0} className="btn-primary disabled:opacity-50">
                   {borrowing ? 'Borrowing...' : 'Borrow Book'}
                 </button>
               )}

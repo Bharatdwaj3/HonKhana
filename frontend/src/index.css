@@ -91,4 +91,9 @@
   .footer-heading {
     @apply text-primary font-semibold mb-4 uppercase tracking-wide text-sm;
   }
+
+  /* Compact pill CTA — same style as .btn-primary, smaller for inline/row contexts */
+  .btn-primary-sm {
+    @apply inline-flex items-center gap-1.5 bg-primary text-white text-[11px] font-bold uppercase tracking-wide rounded-full px-4 py-2 transition-all hover:bg-primary/90;
+  }
 }
