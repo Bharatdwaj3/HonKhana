@@ -1,27 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  /* Literary & Editorial Theme */
+  /* Literary & Editorial Theme — Manuscript palette */
 
   /* Backgrounds & Text */
-  --color-background: #f5f3ef;    /* Fresh page - Soft off-white */
-  --color-foreground: #2b2b2b;    /* Dark neutral for comfortable reading */
+  --color-background: #f7f5f0;    /* Soft off-white page */
+  --color-foreground: #1c1917;    /* Warm near-black for reading text */
 
   /* Primary Accent */
-  --color-primary: #5e2a2b;       /* Rich bordeaux - Deep burgundy for main CTAs/headings */
+  --color-primary: #c4521f;       /* Warm rust — main CTAs/headings */
 
   /* Secondary Accent */
-  --color-secondary: #c9a99a;     /* Old paper - Warm sand for accents and secondary buttons */
+  --color-secondary: #eae4d9;     /* Warm parchment tone for accents/secondary buttons */
 
   /* Muted / Focus Accent */
-  --color-accent: #636380;        /* Blue gray - Muted slate for highlights and focus states */
+  --color-accent: #57534e;        /* Warm slate for highlights and focus states */
 
   /* Cards & Surfaces */
   --color-card: #ffffff;          /* Pure white card backgrounds for strong visual separation */
-  --color-border: #c9a99a;        /* Old paper - Subtle, warm borders */
+  --color-border: #d6cebf;        /* Warm parchment border */
 
   /* Border radius */
   --radius: 0.75rem;              /* Softer radius for editorial components */
+
+  /* Display / accent fonts, used sparingly (logo, section titles, emphasis) */
+  --font-display: "UnifrakturMaguntika", cursive;
+  --font-accent: "Dancing Script", cursive;
 }
 
 @layer components {

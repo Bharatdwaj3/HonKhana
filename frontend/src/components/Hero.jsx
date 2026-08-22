@@ -70,14 +70,14 @@ export const Hero = ({ spotlightBook, floatingBooks = [] }) => {
           Your campus library, online and on the shelf
         </div>
 
-        <h1 className="text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-foreground mb-6 leading-none uppercase select-none">
+        <h1 className="font-display text-6xl lg:text-7xl xl:text-8xl text-foreground mb-6 leading-none tracking-wide select-none">
           HonKhana
         </h1>
 
         <p className="text-base lg:text-lg text-foreground/60 leading-relaxed mb-10 font-light">
           Your digital and walk-in library, in one place. Borrow physical books,
           read digital copies instantly, and
-          <span className="text-primary font-medium ml-1">never lose track of a due date again</span>.
+          <span className="font-accent text-xl text-primary font-bold ml-1">never lose track of a due date again</span>.
         </p>
 
         <div className="flex flex-wrap items-center gap-4 mb-10">

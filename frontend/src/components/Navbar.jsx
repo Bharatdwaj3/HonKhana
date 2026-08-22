@@ -78,7 +78,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           <Link
             to="/"
-            className="text-2xl font-black tracking-tight text-foreground hover:text-primary transition-colors"
+            className="font-display text-3xl tracking-wide text-foreground hover:text-primary transition-colors"
           >
             HonKhana
           </Link>
