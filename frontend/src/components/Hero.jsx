@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Users } from 'lucide-react';
+import { BookOpen, Users } from 'lucide-react';
 
 const STACK_CONFIG = [
-  { rotate: -10, translateY: 20, z: 10, widthClass: 'w-20 sm:w-24', heightClass: 'h-64 sm:h-72', marginClass: '' },
-  { rotate: 0, translateY: 0, z: 30, widthClass: 'w-24 sm:w-28', heightClass: 'h-72 sm:h-80 xl:h-96', marginClass: '-ml-6' },
-  { rotate: 10, translateY: 20, z: 10, widthClass: 'w-20 sm:w-24', heightClass: 'h-64 sm:h-72', marginClass: '-ml-6' },
+  { rotate: -10, translateY: 28, z: 10, widthClass: 'w-28 sm:w-32', heightClass: 'h-80 sm:h-96', marginClass: '' },
+  { rotate: 0, translateY: 0, z: 30, widthClass: 'w-36 sm:w-40', heightClass: 'h-96 sm:h-[28rem] xl:h-[32rem]', marginClass: '-ml-8' },
+  { rotate: 10, translateY: 28, z: 10, widthClass: 'w-28 sm:w-32', heightClass: 'h-80 sm:h-96', marginClass: '-ml-8' },
 ];
 
 const SpineCover = ({ book, config }) => (
@@ -15,15 +15,20 @@ const SpineCover = ({ book, config }) => (
     animate={{ opacity: 1, y: config.translateY }}
     transition={{ duration: 0.9, delay: 0.2 }}
     style={{ transform: `rotate(${config.rotate}deg)`, zIndex: config.z }}
-    className={`relative ${config.widthClass} ${config.heightClass} ${config.marginClass} rounded-lg overflow-hidden border border-border shadow-2xl shrink-0`}
+    className={`relative ${config.widthClass} ${config.heightClass} ${config.marginClass} shrink-0`}
   >
-    {book.coverUrl ? (
-      <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
-    ) : (
-      <div className="w-full h-full bg-card flex items-center justify-center">
-        <BookOpen size={28} className="text-foreground/10" />
-      </div>
-    )}
+    <Link
+      to={`/content/${book.id}`}
+      className="block w-full h-full rounded-lg overflow-hidden border border-border shadow-2xl hover:scale-105 transition-transform duration-300"
+    >
+      {book.coverUrl ? (
+        <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full bg-card flex items-center justify-center">
+          <BookOpen size={32} className="text-foreground/10" />
+        </div>
+      )}
+    </Link>
   </motion.div>
 );
 
@@ -32,10 +37,10 @@ const FloatingTitleCard = ({ book, position, delay }) => (
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.6, delay }}
-    className={`hidden xl:block absolute z-40 bg-card border border-border rounded-xl shadow-xl px-3 py-2 max-w-[160px] ${position}`}
+    className={`hidden xl:block absolute z-40 bg-card border border-border rounded-xl shadow-xl px-4 py-2.5 max-w-[190px] ${position}`}
   >
-    <p className="text-xs font-bold text-foreground truncate">{book.title}</p>
-    <p className="text-[11px] text-foreground/50 truncate">{book.author}</p>
+    <p className="text-sm font-bold text-foreground truncate">{book.title}</p>
+    <p className="text-xs text-neutral-500 font-medium truncate">{book.author}</p>
   </motion.div>
 );
 
@@ -78,7 +83,6 @@ export const Hero = ({ spotlightBook, floatingBooks = [] }) => {
             className="inline-flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 hover:bg-primary/90 hover:scale-105 transition-all"
           >
             Explore the Library
-            <ArrowRight size={14} />
           </Link>
 
           <Link
@@ -96,39 +100,17 @@ export const Hero = ({ spotlightBook, floatingBooks = [] }) => {
         </div>
       </motion.div>
 
-      <div className="hidden lg:flex flex-1 relative bg-background items-center justify-center px-12 xl:px-20 py-16">
+      <div className="hidden lg:flex flex-1 relative bg-background items-center justify-center px-12 xl:px-20 py-16 min-h-[36rem]">
         <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px] pointer-events-none" />
 
         {spotlightBook && (
-          <div className="relative flex flex-col items-center">
-            <div className="relative flex items-end">
-              {stackBooks.map((book, i) =>
-                book ? <SpineCover key={book.id} book={book} config={STACK_CONFIG[i]} /> : null
-              )}
+          <div className="relative flex items-end">
+            {stackBooks.map((book, i) =>
+              book ? <SpineCover key={book.id} book={book} config={STACK_CONFIG[i]} /> : null
+            )}
 
-              {left && <FloatingTitleCard book={left} position="top-2 -left-16" delay={0.9} />}
-              {right && <FloatingTitleCard book={right} position="top-10 -right-16" delay={1.05} />}
-            </div>
-
-            <div className="w-2/3 h-5 bg-black/10 blur-xl rounded-full mt-4" />
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="mt-6 text-center"
-            >
-              <span className="text-xs font-bold uppercase tracking-widest text-primary mb-1 block">Featured Pick</span>
-              <h3 className="text-xl font-bold text-foreground mb-1">{spotlightBook.title}</h3>
-              <p className="text-sm text-foreground/50 mb-4">{spotlightBook.author}</p>
-              <Link
-                to={`/content/${spotlightBook.id}`}
-                className="group inline-flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase tracking-wide rounded-full px-5 py-2.5 hover:bg-primary/90 transition-all"
-              >
-                View Book
-                <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </motion.div>
+            {left && <FloatingTitleCard book={left} position="top-6 -left-24" delay={0.9} />}
+            {right && <FloatingTitleCard book={right} position="top-16 -right-24" delay={1.05} />}
           </div>
         )}
       </div>
