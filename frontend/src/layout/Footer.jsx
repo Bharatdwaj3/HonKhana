@@ -6,7 +6,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-surface border-t border-border mt-auto w-full">
+    <footer className="bg-card border-t border-border mt-auto w-full">
       <div className="container mx-auto px-6 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
 
@@ -17,7 +17,7 @@ const Footer = () => {
                 HonKhana
               </h3>
             </Link>
-            <p className="mt-4 text-muted-foreground text-sm max-w-xs leading-relaxed">
+            <p className="mt-4 text-foreground/50 text-sm max-w-xs leading-relaxed">
               Your digital and walk-in library.<br />
               Borrow, read, and renew — all in one place.
             </p>
@@ -29,7 +29,7 @@ const Footer = () => {
               <h4 className="text-primary font-bold mb-4 uppercase tracking-wider text-xs">
                 Library
               </h4>
-              <ul className="space-y-3 text-muted-foreground text-sm font-medium">
+              <ul className="space-y-3 text-foreground/50 text-sm font-medium">
                 <li><Link to="/explore" className="hover:text-primary transition-colors">Explore Books</Link></li>
                 <li><Link to="/profile" className="hover:text-primary transition-colors">My Loans</Link></li>
               </ul>
@@ -39,7 +39,7 @@ const Footer = () => {
               <h4 className="text-primary font-bold mb-4 uppercase tracking-wider text-xs">
                 Account
               </h4>
-              <ul className="space-y-3 text-muted-foreground text-sm font-medium">
+              <ul className="space-y-3 text-foreground/50 text-sm font-medium">
                 <li><Link to="/login" className="hover:text-primary transition-colors">Log In</Link></li>
                 <li><Link to="/signup" className="hover:text-primary transition-colors">Sign Up</Link></li>
                 <li><Link to="/profile" className="hover:text-primary transition-colors">My Profile</Link></li>
@@ -50,7 +50,7 @@ const Footer = () => {
               <h4 className="text-primary font-bold mb-4 uppercase tracking-wider text-xs">
                 Support
               </h4>
-              <ul className="space-y-3 text-muted-foreground text-sm font-medium">
+              <ul className="space-y-3 text-foreground/50 text-sm font-medium">
                 <li><Link to="/coming-soon" className="hover:text-primary transition-colors">Help Center</Link></li>
                 <li><Link to="/coming-soon" className="hover:text-primary transition-colors">Contact Us</Link></li>
                 <li><Link to="/coming-soon" className="hover:text-primary transition-colors">Community</Link></li>
@@ -66,7 +66,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center text-xs font-medium text-muted-foreground">
+        <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center text-xs font-medium text-foreground/50">
           <div>
             © {currentYear} HonKhana. All rights reserved.
           </div>
@@ -75,7 +75,7 @@ const Footer = () => {
             <Link 
               to="/coming-soon" 
               aria-label="Twitter" 
-              className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
+              className="text-foreground/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <Twitter size={18} strokeWidth={2} className="shrink-0" />
               <span className="text-[11px] font-bold">X</span>
@@ -83,7 +83,7 @@ const Footer = () => {
             <Link 
               to="/coming-soon" 
               aria-label="Instagram" 
-              className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
+              className="text-foreground/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <Instagram size={18} strokeWidth={2} className="shrink-0" />
               <span className="text-[11px] font-bold">IG</span>
@@ -91,7 +91,7 @@ const Footer = () => {
             <Link 
               to="/coming-soon" 
               aria-label="GitHub" 
-              className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
+              className="text-foreground/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <Github size={18} strokeWidth={2} className="shrink-0" />
               <span className="text-[11px] font-bold">GH</span>

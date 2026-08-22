@@ -115,15 +115,15 @@ export const Hero = ({ spotlightBook }) => {
                   {spotlightBook.author}
                 </p>
 
-                {spotlightBook.synopsis && (
+                {spotlightBook.description && (
                   <p className="text-xs text-foreground/60 leading-relaxed mb-5 line-clamp-2 hidden sm:block">
-                    {spotlightBook.synopsis}
+                    {spotlightBook.description}
                   </p>
                 )}
 
                 <Link
                   to={`/content/${spotlightBook.id}`}
-                  className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full px-5 py-2.5 hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
+                  className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-primary text-white rounded-full px-5 py-2.5 hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
                 >
                   View Book
                   <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
