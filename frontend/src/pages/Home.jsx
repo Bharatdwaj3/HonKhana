@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <main className="bg-background text-foreground selection:bg-primary/20">
       <div className="pt-20">
-        <Hero spotlightBook={featured[0]} />
+        <Hero spotlightBook={featured[0]} floatingBooks={featured.slice(1, 4)} />
       </div>
       <section className="relative py-24 px-6 lg:px-24">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />

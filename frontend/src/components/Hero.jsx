@@ -1,130 +1,137 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Users } from 'lucide-react';
 
-export const Hero = ({ spotlightBook }) => {
+const FLOAT_POSITIONS = [
+  'top-4 -left-10 xl:-left-16 -rotate-6',
+  'bottom-10 -right-8 xl:-right-14 rotate-3',
+  'top-1/2 -left-14 xl:-left-20 rotate-2',
+];
+
+const FloatingBookCard = ({ book, position, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay }}
+    className={`hidden xl:flex absolute z-20 items-center gap-3 bg-card border border-border rounded-xl shadow-xl px-3 py-2.5 max-w-[190px] ${position}`}
+  >
+    <div className="w-9 h-12 rounded-md overflow-hidden shrink-0 bg-background border border-border">
+      {book.coverUrl ? (
+        <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <BookOpen size={14} className="text-foreground/20" />
+        </div>
+      )}
+    </div>
+    <div className="min-w-0">
+      <p className="text-xs font-bold text-foreground truncate">{book.title}</p>
+      <p className="text-[11px] text-foreground/50 truncate">{book.author}</p>
+    </div>
+  </motion.div>
+);
+
+export const Hero = ({ spotlightBook, floatingBooks = [] }) => {
   return (
-    <header className="relative min-h-[calc(100vh-4rem)] w-full bg-background overflow-hidden">
-      {/* Background Ambient Glows */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute top-1/4 right-10 w-96 h-96 bg-secondary/20 blur-[120px] rounded-full" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-primary/10 blur-[100px] rounded-full" />
+    <header className="relative min-h-screen w-full flex bg-background overflow-hidden">
+
+      <div className="absolute inset-0 z-0 opacity-30">
+        <div className="absolute top-[-10%] right-[-5%] w-[60%] h-[70%] bg-secondary/10 blur-[120px] rounded-full animate-slow-drift" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[60%] bg-primary/8 blur-[100px] rounded-full animate-slow-drift animation-delay-500" />
       </div>
 
-      {/* Main Container */}
-      <div className="relative w-full min-h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-2 z-10">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1.2 }}
+        className="w-full lg:w-[35%] lg:min-w-[380px] flex flex-col justify-center px-8 lg:px-16 xl:px-24 z-20 bg-card/50 backdrop-blur-md border-r border-border"
+      >
+        <div className="inline-flex items-center gap-2 w-fit mb-8 px-4 py-1.5 rounded-full border border-border bg-background/60 text-xs font-semibold text-foreground/60">
+          <BookOpen size={13} strokeWidth={2.5} className="text-primary" />
+          Your campus library, online and on the shelf
+        </div>
 
-        {/* Left Column: Typography & Action Links */}
+        <h1 className="text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-foreground mb-6 leading-none uppercase select-none">
+          HonKhana
+        </h1>
+
+        <p className="text-base lg:text-lg text-foreground/60 leading-relaxed mb-10 font-light">
+          Your digital and walk-in library, in one place. Borrow physical books,
+          read digital copies instantly, and
+          <span className="text-primary font-medium ml-1">never lose track of a due date again</span>.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-4 mb-10">
+          <Link
+            to="/explore"
+            className="inline-flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 hover:bg-primary/90 hover:scale-105 transition-all"
+          >
+            Explore the Library
+            <ArrowRight size={14} />
+          </Link>
+
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-2 border border-border text-foreground/70 text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 hover:border-primary hover:text-primary transition-all"
+          >
+            <BookOpen size={14} strokeWidth={2.5} />
+            View My Loans
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2.5 text-xs font-medium text-foreground/40">
+          <Users size={15} strokeWidth={2} />
+          Trusted by students & faculty on campus
+        </div>
+      </motion.div>
+
+      <div className="hidden lg:flex flex-1 relative bg-background items-center justify-center px-12 xl:px-24">
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col justify-center px-6 lg:px-16 py-16 lg:py-0"
-        >
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground mb-6 leading-none uppercase select-none">
-            HonKhana
-          </h1>
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 0.15 }}
+          transition={{ duration: 2, delay: 0.5 }}
+          className="absolute w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(220,38,38,0.2)]"
+        />
+        <div className="w-[50%] h-[45%] bg-accent/5 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px]" />
 
-          <p className="text-base sm:text-lg text-foreground/70 leading-relaxed mb-8 max-w-md font-light">
-            Your digital and walk-in library, in one place. Borrow physical books,
-            read digital copies instantly, and
-            <span className="text-primary font-medium ml-1">never lose track of a due date again</span>.
-          </p>
-
-          <div className="flex flex-col sm:flex-row lg:flex-col items-start gap-6">
-            <Link 
-              to="/explore" 
-              className="group relative flex items-center gap-4 w-fit hover:translate-x-1 transition-transform"
-            >
-              <span className="text-xs font-bold uppercase tracking-widest text-foreground/80 group-hover:text-primary transition-colors border-b-2 border-border pb-1 group-hover:border-primary">
-                Explore the Library
-              </span>
-              <div className="flex gap-1.5 items-center">
-                <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(220,38,38,0.5)] animate-pulse" />
-                <div className="w-1.5 h-1.5 rounded-full bg-foreground/20" />
-              </div>
-            </Link>
-
-            <Link 
-              to="/profile" 
-              className="flex items-center gap-2.5 text-xs font-semibold text-foreground/50 uppercase tracking-wider hover:text-foreground transition-colors cursor-pointer w-fit group"
-            >
-              <BookOpen size={14} strokeWidth={2.5} className="group-hover:text-primary transition-colors" />
-              View My Loans
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Right Column: Full-bleed Featured Spotlight — the cover fills the
-            entire column instead of floating as a small card in empty space. */}
         {spotlightBook && (
           <motion.div
-            initial={{ opacity: 0, scale: 1.03 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9 }}
-            className="relative min-h-[60vh] lg:min-h-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="relative z-10"
           >
-            <Link to={`/content/${spotlightBook.id}`} className="absolute inset-0 block">
+            {floatingBooks.slice(0, 3).map((book, i) => (
+              <FloatingBookCard
+                key={book.id}
+                book={book}
+                position={FLOAT_POSITIONS[i]}
+                delay={0.9 + i * 0.15}
+              />
+            ))}
+
+            <Link
+              to={`/content/${spotlightBook.id}`}
+              className="relative z-10 block w-56 h-80 xl:w-64 xl:h-96 rounded-2xl overflow-hidden border border-border shadow-2xl hover:scale-105 transition-transform duration-300"
+            >
               {spotlightBook.coverUrl ? (
-                <img
-                  src={spotlightBook.coverUrl}
-                  alt={spotlightBook.title}
-                  className="w-full h-full object-cover"
-                />
+                <img src={spotlightBook.coverUrl} alt={spotlightBook.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-card flex items-center justify-center">
-                  <BookOpen size={64} className="text-foreground/10" />
+                  <BookOpen size={48} className="text-foreground/10" />
                 </div>
               )}
             </Link>
 
-            {/* Gradient so the overlaid text stays legible over any cover image */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent lg:bg-gradient-to-r lg:from-background lg:via-transparent lg:to-transparent pointer-events-none" />
-
-            <div className="absolute bottom-0 left-0 right-0 lg:right-auto lg:max-w-md p-8 lg:p-12">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-primary mb-2">
-                <Sparkles size={12} strokeWidth={2.5} />
-                Featured Pick
-              </span>
-
-              {Array.isArray(spotlightBook.genre) && spotlightBook.genre.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {spotlightBook.genre.slice(0, 2).map((g) => (
-                    <span
-                      key={g}
-                      className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 border border-border/60 rounded-full px-2 py-0.5 bg-background/70 backdrop-blur-sm"
-                    >
-                      {g.replace(/_/g, ' ')}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 leading-tight line-clamp-2">
-                {spotlightBook.title}
-              </h3>
-              <p className="text-sm text-foreground/60 mb-4 font-medium">
-                {spotlightBook.author}
-              </p>
-
-              {spotlightBook.description && (
-                <p className="text-sm text-foreground/70 leading-relaxed mb-5 line-clamp-2">
-                  {spotlightBook.description}
-                </p>
-              )}
-
-              <Link
-                to={`/content/${spotlightBook.id}`}
-                className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-primary text-white rounded-full px-5 py-2.5 hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
-              >
-                View Book
-                <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <div className="mt-5 text-center">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary mb-1 block">Featured Pick</span>
+              <h3 className="text-lg font-bold text-foreground">{spotlightBook.title}</h3>
+              <p className="text-sm text-foreground/50">{spotlightBook.author}</p>
             </div>
           </motion.div>
         )}
-
       </div>
     </header>
   );
