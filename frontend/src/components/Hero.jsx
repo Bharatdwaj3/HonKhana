@@ -83,14 +83,14 @@ export const Hero = ({ spotlightBook, floatingBooks = [] }) => {
         <div className="flex flex-wrap items-center gap-4 mb-10">
           <Link
             to="/explore"
-            className="inline-flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 hover:bg-primary/90 hover:scale-105 transition-all"
+            className="btn-primary hover:scale-105"
           >
             Explore the Library
           </Link>
 
           <Link
             to="/profile"
-            className="inline-flex items-center gap-2 border border-border text-foreground/70 text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 hover:border-primary hover:text-primary transition-all"
+            className="btn-outline"
           >
             <BookOpen size={14} strokeWidth={2.5} />
             View My Loans

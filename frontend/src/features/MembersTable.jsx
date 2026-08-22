@@ -10,7 +10,7 @@ const MembersTable = ({ rows, onSelect }) => (
   <div className="bg-card rounded-2xl border border-border overflow-hidden">
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-border text-left text-foreground/50 text-sm font-semibold uppercase tracking-wide">
+        <tr className="table-header-row">
           <th className="p-4">Member</th>
           <th className="p-4">Role</th>
           <th className="p-4">Active Loans</th>

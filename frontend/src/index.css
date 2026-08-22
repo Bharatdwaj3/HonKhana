@@ -71,4 +71,24 @@
   .content-card:hover {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
+
+  /* Primary pill CTA button (Hero, etc.) */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 transition-all hover:bg-primary/90;
+  }
+
+  /* Outline pill secondary button */
+  .btn-outline {
+    @apply inline-flex items-center gap-2 border border-border text-foreground/70 text-xs font-bold uppercase tracking-wide rounded-full px-6 py-3.5 transition-all hover:border-primary hover:text-primary;
+  }
+
+  /* Shared table header row (FinesSection, LoansTable, MembersTable) */
+  .table-header-row {
+    @apply border-b border-border text-left text-foreground/50 text-sm font-semibold uppercase tracking-wide;
+  }
+
+  /* Footer column heading */
+  .footer-heading {
+    @apply text-primary font-semibold mb-4 uppercase tracking-wide text-sm;
+  }
 }

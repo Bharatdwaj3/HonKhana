@@ -64,7 +64,7 @@ const LoansTable = ({
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border text-left text-foreground/50 text-sm font-semibold uppercase tracking-wide">
+              <tr className="table-header-row">
                 <th className="p-4">Cover</th>
                 <th className="p-4">Book</th>
                 <th className="p-4">Due Date</th>

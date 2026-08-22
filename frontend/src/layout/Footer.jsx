@@ -23,7 +23,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-primary font-semibold mb-4 uppercase tracking-wide text-sm">
+            <h4 className="footer-heading">
               Library
             </h4>
             <ul className="space-y-3 text-foreground/50 text-sm">
@@ -33,7 +33,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-primary font-semibold mb-4 uppercase tracking-wide text-sm">
+            <h4 className="footer-heading">
               Account
             </h4>
             <ul className="space-y-3 text-foreground/50 text-sm">
@@ -44,7 +44,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-primary font-semibold mb-4 uppercase tracking-wide text-sm">
+            <h4 className="footer-heading">
               Support
             </h4>
             <ul className="space-y-3 text-foreground/50 text-sm">
@@ -61,7 +61,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-primary font-semibold mb-4 uppercase tracking-wide text-sm">
+            <h4 className="footer-heading">
               Contact
             </h4>
             <ul className="space-y-3 text-foreground/50 text-sm">
