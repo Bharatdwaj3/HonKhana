@@ -84,7 +84,7 @@ const Navbar = () => {
           </Link>
           <Link
             to="/explore"
-            className="hidden sm:block text-sm font-semibold text-foreground/70 hover:text-primary transition-colors"
+            className="hidden sm:block font-display text-base tracking-wide text-foreground/70 hover:text-primary transition-colors"
           >
             Explore
           </Link>
