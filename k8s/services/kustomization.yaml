@@ -34,16 +34,16 @@ resources:
 images:
   - name: catalog
     newName: ghcr.io/bharatdwaj3/catalog
-    newTag: 95a2119
+    newTag: 75bc41a
   - name: circulation
     newName: ghcr.io/bharatdwaj3/circulation
-    newTag: 95a2119
+    newTag: 75bc41a
   - name: members
     newName: ghcr.io/bharatdwaj3/members
-    newTag: 95a2119
+    newTag: 75bc41a
   - name: firebase
     newName: ghcr.io/bharatdwaj3/firebase
-    newTag: 95a2119
+    newTag: 75bc41a
   - name: ghcr.io/bharatdwaj3/frontend
     newName: ghcr.io/bharatdwaj3/frontend
-    newTag: 95a2119
+    newTag: 75bc41a
