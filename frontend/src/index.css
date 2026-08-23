@@ -99,4 +99,9 @@
   .btn-primary-sm {
     @apply inline-flex items-center gap-1.5 bg-primary text-white text-[11px] font-bold uppercase tracking-wide rounded-full px-4 py-2 transition-all hover:bg-primary/90;
   }
+
+  /* Compact outline pill — same style as .btn-outline, smaller for table row actions */
+  .btn-outline-sm {
+    @apply inline-flex items-center gap-1.5 border border-border text-foreground/70 text-[11px] font-bold uppercase tracking-wide rounded-full px-4 py-2 transition-all hover:border-primary hover:text-primary;
+  }
 }

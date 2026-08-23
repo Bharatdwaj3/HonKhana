@@ -128,7 +128,7 @@ const LoansSection = ({
         <button
           type="button"
           onClick={() => window.location.href = "/staff/new"}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground/10 text-foreground border border-border rounded-xl text-sm font-semibold hover:border-primary hover:text-primary transition-all"
+          className="btn-outline"
         >
           <span className="text-lg leading-none">+</span> Add New Book
         </button>
@@ -271,7 +271,7 @@ const LoansSection = ({
               <button
                 type="button"
                 onClick={() => setShowIssueModal(false)}
-                className="px-4 py-2.5 border border-border rounded-xl text-sm font-semibold hover:bg-foreground/5 transition-all"
+                className="btn-outline"
               >
                 Cancel
               </button>

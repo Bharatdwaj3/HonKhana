@@ -111,7 +111,7 @@ const LoansTable = ({
                           <button
                             onClick={() => onReturn(loan.id)}
                             disabled={returningId === loan.id}
-                            className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-border text-foreground/70 hover:border-primary hover:text-primary transition-all disabled:opacity-50"
+                            className="btn-outline-sm disabled:opacity-50"
                           >
                             {returningId === loan.id ? 'Returning...' : 'Return'}
                           </button>
@@ -120,7 +120,7 @@ const LoansTable = ({
                           <button
                             onClick={() => onRenew(loan.id)}
                             disabled={renewingId === loan.id}
-                            className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-border text-foreground/70 hover:border-primary hover:text-primary transition-all disabled:opacity-50"
+                            className="btn-outline-sm disabled:opacity-50"
                           >
                             {renewingId === loan.id ? 'Renewing...' : 'Renew'}
                           </button>
@@ -129,7 +129,7 @@ const LoansTable = ({
                           <button
                             onClick={() => onWaiveFine(loan.id)}
                             disabled={waivingFineForLoanId === loan.id}
-                            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-foreground/5 border border-border hover:border-primary transition-all disabled:opacity-50"
+                            className="btn-outline-sm disabled:opacity-50"
                           >
                             {waivingFineForLoanId === loan.id ? 'Waiving...' : 'Waive Fine'}
                           </button>

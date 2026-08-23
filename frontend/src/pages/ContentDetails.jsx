@@ -145,7 +145,7 @@ const ContentDetails = () => {
               )}
 
               {book.pdfUrl && (
-                <button onClick={() => navigate(`/read/${id}`)} className="flex items-center gap-2 px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-foreground/5 transition-all">
+                <button onClick={() => navigate(`/read/${id}`)} className="btn-outline">
                   <FileText size={20} /> Read Now
                 </button>
               )}

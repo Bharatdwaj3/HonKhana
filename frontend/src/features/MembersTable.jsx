@@ -36,7 +36,7 @@ const MembersTable = ({ rows, onSelect }) => (
             <td className="p-4">
               <button
                 onClick={() => onSelect(row)}
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-foreground/5 border border-border hover:border-primary transition-all"
+                className="btn-outline-sm"
               >
                 View Details
               </button>
