@@ -75,7 +75,7 @@ const FinesSection = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-3">Fines & Fee Ledger</h2>
+      <h2 className="font-display text-lg tracking-wide mb-3">Fines & Fee Ledger</h2>
       {error && <p className="text-sm text-primary mb-6">{error}</p>}
       {payError && <p className="text-sm text-red-500 mb-6">{payError}</p>}
       <FinesTable fines={fines} payingId={payingId} onPay={handlePay} />

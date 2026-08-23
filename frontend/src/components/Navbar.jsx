@@ -140,7 +140,7 @@ const Navbar = () => {
                       getInitial(user)
                     )}
                   </div>
-                  <span className="hidden md:block text-sm font-semibold text-foreground">
+                  <span className="hidden md:block font-display text-base tracking-wide text-foreground">
                     {getDisplayName(user)}
                   </span>
                 </button>
@@ -159,7 +159,7 @@ const Navbar = () => {
                         className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50"
                       >
                         <div className="px-4 py-3 border-b border-border bg-foreground/[0.02]">
-                          <p className="font-semibold text-foreground text-sm">{getDisplayName(user)}</p>
+                          <p className="font-display text-base tracking-wide text-foreground">{getDisplayName(user)}</p>
                           <p className="text-xs text-foreground/50 capitalize">{user.role}</p>
                         </div>
 
