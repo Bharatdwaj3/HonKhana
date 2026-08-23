@@ -53,7 +53,7 @@ export default function Profile() {
               )}
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight">{getDisplayName(user)}</h1>
+              <h1 className="font-display text-2xl tracking-wide">{getDisplayName(user)}</h1>
               <span className="inline-block mt-1 px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-full capitalize">
                 {user.role}
               </span>

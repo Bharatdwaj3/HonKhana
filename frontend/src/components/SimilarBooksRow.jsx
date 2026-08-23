@@ -10,7 +10,7 @@ export default function SimilarBooksRow({ title, books, emptyMessage }) {
     if (!emptyMessage) return null;
     return (
       <div className="mt-12">
-        <h2 className="text-lg font-bold text-foreground mb-4">{title}</h2>
+        <h2 className="font-display text-lg tracking-wide text-foreground mb-4">{title}</h2>
         <div className="rounded-2xl border border-border bg-card/50 px-6 py-8 text-center text-sm text-foreground/50">
           {emptyMessage}
         </div>
@@ -20,7 +20,7 @@ export default function SimilarBooksRow({ title, books, emptyMessage }) {
 
   return (
     <div className="mt-12">
-      <h2 className="text-lg font-bold text-foreground mb-4">{title}</h2>
+      <h2 className="font-display text-lg tracking-wide text-foreground mb-4">{title}</h2>
       <div className="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-thin">
         {books.map((book, index) => (
           <motion.article
