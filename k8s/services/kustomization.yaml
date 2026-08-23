@@ -43,7 +43,11 @@ images:
     newTag: 75bc41a
   - name: firebase
     newName: ghcr.io/bharatdwaj3/firebase
+<<<<<<< HEAD
     newTag: 75bc41a
+=======
+    newTag: v3
+>>>>>>> 8e40c9a (fix(ci): scope manifest tag update to only the 4 built services)
   - name: ghcr.io/bharatdwaj3/frontend
     newName: ghcr.io/bharatdwaj3/frontend
     newTag: 75bc41a

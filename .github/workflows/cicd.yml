@@ -83,7 +83,12 @@ jobs:
 
       - name: Update image tags in kustomization.yaml
         run: |
-          sed -i "s|newTag: .*|newTag: ${{ env.SHORT_SHA }}|" k8s/services/kustomization.yaml
+          sed -i \
+            -e "/^  - name: catalog$/,/newTag:/ s|newTag: .*|newTag: ${{ env.SHORT_SHA }}|" \
+            -e "/^  - name: circulation$/,/newTag:/ s|newTag: .*|newTag: ${{ env.SHORT_SHA }}|" \
+            -e "/^  - name: members$/,/newTag:/ s|newTag: .*|newTag: ${{ env.SHORT_SHA }}|" \
+            -e "/^  - name: ghcr.io\/bharatdwaj3\/frontend$/,/newTag:/ s|newTag: .*|newTag: ${{ env.SHORT_SHA }}|" \
+            k8s/services/kustomization.yaml
 
       - name: Commit and push updated manifest
         run: |
